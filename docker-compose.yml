@@ -1,0 +1,147 @@
+# PASO 0: Compose compartido del equipo.
+# Seis servicios arrancables con `docker compose up --build`.
+# Persona A: tres servicios reales. Personas B/C: placeholders HTTP 501, NO son implementaciones finales.
+# ÚNICO puerto publicado: gateway 8080 (limitado a localhost durante desarrollo).
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    environment:
+      SERVICE: gateway
+      PORT: '8080'
+      JWT_ALGORITHM: HS256
+      JWT_SECRET: ${JWT_SECRET:-}
+      BFF_URL: http://bff:3000
+      ORQUESTADOR_URL: http://orquestador:4000
+    ports:
+      - '127.0.0.1:8080:8080'
+    depends_on:
+      bff:
+        condition: service_healthy
+      orquestador:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:8080/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  bff:
+    build:
+      context: .
+      dockerfile: bff/Dockerfile
+    environment:
+      SERVICE: bff
+      PORT: '3000'
+      ORQUESTADOR_URL: http://orquestador:4000
+      ESPACIOS_URL: http://espacios:5001
+      PAGOS_URL: http://pagos:5002
+      ACCESO_URL: http://acceso:5003
+    expose:
+      - '3000'
+    depends_on:
+      orquestador:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:3000/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  orquestador:
+    build:
+      context: .
+      dockerfile: orquestador/Dockerfile
+    environment:
+      SERVICE: orquestador
+      PORT: '4000'
+      ESPACIOS_URL: http://espacios:5001
+      PAGOS_URL: http://pagos:5002
+      ACCESO_URL: http://acceso:5003
+      # El responsable B sustituirá el stub y agregará su propia BD persistente.
+    expose:
+      - '4000'
+    depends_on:
+      espacios:
+        condition: service_healthy
+      pagos:
+        condition: service_healthy
+      acceso:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:4000/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  espacios:
+    build:
+      context: .
+      dockerfile: espacios/Dockerfile
+      args:
+        SERVICE: espacios
+    environment:
+      SERVICE: espacios
+      PORT: '5001'
+      DB_PATH: /data/espacios.db
+    expose:
+      - '5001'
+    volumes:
+      - espacios_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:5001/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  pagos:
+    build:
+      context: .
+      dockerfile: pagos/Dockerfile
+      args:
+        SERVICE: pagos
+    environment:
+      SERVICE: pagos
+      PORT: '5002'
+      DB_PATH: /data/pagos.db
+    expose:
+      - '5002'
+    volumes:
+      - pagos_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:5002/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  acceso:
+    build:
+      context: .
+      dockerfile: acceso/Dockerfile
+      args:
+        SERVICE: acceso
+    environment:
+      SERVICE: acceso
+      PORT: '5003'
+      DB_PATH: /data/acceso.db
+    expose:
+      - '5003'
+    volumes:
+      - acceso_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:5003/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  espacios_data:
+  pagos_data:
+  acceso_data:

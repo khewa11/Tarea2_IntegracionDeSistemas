@@ -1,0 +1,23 @@
+espacios GET  /health                                  HTTP 200: {"servicio": "espacios", "estado": "ok"}
+pagos    GET  /health                                  HTTP 200: {"servicio": "pagos", "estado": "ok", "pasarela": "SIMULADA"}
+acceso   GET  /health                                  HTTP 200: {"servicio": "acceso", "estado": "ok", "controlador": "ok"}
+
+=== CAMINO FELIZ demo-ok-3513166a ===
+espacios POST /reservas                                HTTP 201: {"sagaId": "demo-ok-3513166a", "espacioId": "E-001", "estado": "RESERVADA"}
+pagos    POST /cobros                                  HTTP 201: {"sagaId": "demo-ok-3513166a", "monto": "4500", "moneda": "CLP", "estado": "COBRADO", "referenciaPasarela": "SIM-demo-ok-3513166a"}
+acceso   POST /habilitaciones                          HTTP 201: {"sagaId": "demo-ok-3513166a", "patente": "ABCD12", "espacioId": "E-001", "estado": "HABILITADA"}
+
+=== FALLO ULTIMO PASO + COMPENSACION ===
+espacios POST /reservas                                HTTP 201: {"sagaId": "demo-fail-740ea643", "espacioId": "E-002", "estado": "RESERVADA"}
+pagos    POST /cobros                                  HTTP 201: {"sagaId": "demo-fail-740ea643", "monto": "2500", "moneda": "CLP", "estado": "COBRADO", "referenciaPasarela": "SIM-demo-fail-740ea643"}
+acceso   POST /admin/falla                             HTTP 200: {"modo": "error", "delayMs": 0}
+acceso   POST /habilitaciones                          HTTP 502: {"error": "ERROR_CONTROLADOR_EXTERNO", "modo": "error", "servicio": "acceso"}
+acceso   POST /habilitaciones/demo-fail-740ea643/revocar HTTP 200: {"sagaId": "demo-fail-740ea643", "estado": "REVOCADA"}
+pagos    POST /cobros/demo-fail-740ea643/reembolso     HTTP 200: {"sagaId": "demo-fail-740ea643", "estado": "REEMBOLSADO"}
+espacios POST /reservas/demo-fail-740ea643/liberar     HTTP 200: {"sagaId": "demo-fail-740ea643", "estado": "LIBERADA"}
+acceso   POST /admin/falla                             HTTP 200: {"modo": "ok", "delayMs": 0}
+espacios GET  /reservas/demo-fail-740ea643             HTTP 200: {"sagaId": "demo-fail-740ea643", "espacioId": "E-002", "estado": "LIBERADA", "creadoEn": "2026-11-21T01:58:34.204+00:00", "actualizadoEn": "2026-11-21T01:58:34.219+00:00"}
+pagos    GET  /cobros/demo-fail-740ea643               HTTP 200: {"sagaId": "demo-fail-740ea643", "monto": "2500", "moneda": "CLP", "estado": "REEMBOLSADO", "referenciaPasarela": "SIM-demo-fail-740ea643", "creadoEn": "2026-11-21T01:58:34.207+00:00", "actualizadoEn": "2026-11-21T01:58:34.217+00:00"}
+acceso   GET  /habilitaciones/demo-fail-740ea643       HTTP 200: {"sagaId": "demo-fail-740ea643", "patente": null, "espacioId": null, "estado": "REVOCADA", "creadoEn": "2026-11-21T01:58:34.214+00:00", "actualizadoEn": "2026-11-21T01:58:34.214+00:00"}
+
+✔ DEMO A: éxito y compensación verificados. Para CB/Bulkhead integrar Persona B.

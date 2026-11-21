@@ -1,0 +1,20 @@
+Validación automática de Paso 0 — Proyecto Forma C
+===================================================
+
+Resumen:
+- Se cargó correctamente docker-compose.yml usando el parser YAML de Python.
+- Contenedores definidos: gateway:8080, bff:3000, orquestador:4000,
+  espacios:5001, pagos:5002, acceso:5003.
+- ÚNICO puerto publicado: gateway 127.0.0.1:8080:8080.
+- A tiene volúmenes independientes: espacios_data, pagos_data, acceso_data.
+- Dockerfiles y carpetas de seis servicios existentes.
+- Stubs B/C: GET /health -> 200 con implementado=false;
+  POST /reservas-estacionamiento -> HTTP 501.
+- Pruebas: 17/17 aprobadas (ver docs/resultado_pruebas.txt).
+
+Límites:
+- No se ejecutó `docker compose up` debido a que Docker CLI no está disponible
+  en el entorno de preparación. Ejecutarlo en Docker Desktop antes de entregar.
+- Los servicios gateway, bff y orquestador son stubs de inicialización;
+  NO se han implementado JWT, rate limiting, Saga automática ni resiliencia B/C.
+- El contrato es una PROPUESTA hasta que todos los integrantes lo validen.
