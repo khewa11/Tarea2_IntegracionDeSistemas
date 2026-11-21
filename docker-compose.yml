@@ -1,6 +1,6 @@
 # PASO 0: Compose compartido del equipo.
 # Seis servicios arrancables con `docker compose up --build`.
-# Persona A: tres servicios reales. Personas B/C: placeholders HTTP 501, NO son implementaciones finales.
+# Persona A: tres servicios reales. Persona B: orquestador real. Persona C: placeholders HTTP 501.
 # ÚNICO puerto publicado: gateway 8080 (limitado a localhost durante desarrollo).
 services:
   gateway:
@@ -61,9 +61,18 @@ services:
       ESPACIOS_URL: http://espacios:5001
       PAGOS_URL: http://pagos:5002
       ACCESO_URL: http://acceso:5003
-      # El responsable B sustituirá el stub y agregará su propia BD persistente.
+      DB_PATH: /data/orquestador.db
+      # Resiliencia (Persona B). Acceso en modo lento con delayMs 2500 supera TIMEOUT_S.
+      TIMEOUT_S: '2.0'
+      CB_UMBRAL_FALLOS: '3'
+      CB_ESPERA_S: '10'
+      BULKHEAD_MAX: '5'
+      COMPENSACION_REINTENTOS: '3'
+      RECUPERACION_INTERVALO_S: '15'
     expose:
       - '4000'
+    volumes:
+      - orquestador_data:/data
     depends_on:
       espacios:
         condition: service_healthy
@@ -145,3 +154,4 @@ volumes:
   espacios_data:
   pagos_data:
   acceso_data:
+  orquestador_data:
