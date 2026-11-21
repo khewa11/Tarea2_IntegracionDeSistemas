@@ -89,19 +89,45 @@ Modos admitidos de `POST /admin/falla`: `ok`, `lento`, `caido`, `error`; `delayM
 - Una falla inducida en Acceso antes de confirmar habilitación **no crea un resultado exitoso almacenado**, por lo que un reintento legítimo podría funcionar al volver a `ok` si aún no se compensó.
 - `POST` repetido exactamente igual responde **mismo código + mismo cuerpo**, incluso después de haber compensado. Los `GET` son la fuente del estado actual.
 
-## 4. Contratos de Persona B — PENDIENTES DE IMPLEMENTACIÓN
+## 4. Contratos de Persona B — IMPLEMENTADOS (propuesta v1.1, pendiente de visto bueno de A y C)
 
-**Orquestador:** `http://orquestador:4000`
+**Orquestador:** `http://orquestador:4000` · código en `orquestador/` · pruebas en `orquestador/tests/`.
 
-| Método | Ruta | Entrada | Respuesta mínima |
+| Método | Ruta | Entrada | Respuesta |
 |---|---|---|---|
-| `POST` | `/reservas-estacionamiento` | `{"espacioId":"E-001","patente":"ABCD12","monto":4000}` | `{"sagaId":"<id>","estado":"<estado>"}` |
-| `GET` | `/reservas-estacionamiento/{sagaId}` | — | Estado de la saga persistido por B; **forma exacta por concretar con B** |
-| `GET` | `/metrics` | — | Métricas observables de CB, bulkhead, latencias y sagas; **formato por concretar con B** |
+| `POST` | `/reservas-estacionamiento` | `{"espacioId":"E-001","patente":"ABCD12","monto":4000}` (+ `sagaId` opcional) | `{"sagaId":"S-…","estado":"…","motivo":null}` |
+| `GET` | `/reservas-estacionamiento/{sagaId}` | — | Saga completa: `sagaId, estado, espacioId, patente, monto, avance, motivo, creadoEn, actualizadoEn, transiciones[]`; `404 SAGA_NO_ENCONTRADA` |
+| `GET` | `/metrics` | — | JSON con conteo de sagas por estado y, por dependencia: resultados, latencias (promedio/p50/p95/max), Circuit Breaker y Bulkhead |
+| `GET` | `/health` | — | `{"servicio":"orquestador","estado":"ok","implementado":true,"circuitos":{…}}` |
 
-Secuencia éxito: `POST espacios/reservas` → `POST pagos/cobros` → `POST acceso/habilitaciones`. Tras fallo en último paso: `POST acceso/habilitaciones/{sagaId}/revocar` (preventiva) → `POST pagos/cobros/{sagaId}/reembolso` → `POST espacios/reservas/{sagaId}/liberar`. Si el paso 2 falla, solo se libera el espacio. Timeout en todas las llamadas; Circuit Breaker con fallback rápido y Bulkhead sobre Acceso. La Saga guarda su estado en almacenamiento propio.
+**`sagaId` opcional:** si el cliente o el gateway lo envía (`^[A-Za-z0-9_-]{1,64}$`), repetir el POST devuelve la misma saga sin repetir efectos. Si no se envía, el orquestador genera `S-<uuid>`.
 
-**Propuesta por validar con B antes de integrar:** representar estados finales como `COMPLETADA` y `COMPENSADA`, y los estados intermedios que B elija. El documento original solo exige `{sagaId, estado}`, no impone vocabulario de valores.
+**Estados de la saga y código HTTP del POST:**
+
+| Estado | Significado | HTTP |
+|---|---|---|
+| `COMPLETADA` | Reservado, cobrado y habilitado | `201` |
+| `FALLIDA` | Rechazada sin efectos. Motivo de negocio (`ESPACIO_OCUPADO`, `ESPACIO_NO_ENCONTRADO`) | `409` |
+| `FALLIDA` | Rechazo rápido sin tocar servicios porque hay un circuito abierto (`CIRCUITO_ABIERTO_<SERVICIO>`) | `503` |
+| `COMPENSADA` | Falló un paso y se deshicieron los anteriores (`ACCESO_TIMEOUT`, `ACCESO_HTTP_5XX_502`, `BULKHEAD_LLENO_ACCESO`, …) | `503` |
+| `COMPENSACION_PENDIENTE` | Alguna compensación no se pudo aplicar; se reintenta cada `RECUPERACION_INTERVALO_S` | `503` |
+| `INICIADA`, `ESPACIO_RESERVADO`, `PAGO_COBRADO`, `COMPENSANDO` | Intermedios (visibles en GET) | `202` si se repite un `sagaId` en curso |
+
+**Secuencia:** `POST espacios/reservas` → `POST pagos/cobros` → `POST acceso/habilitaciones`. El estado se persiste **antes** de cada llamada (columna `avance`).
+**Compensación (orden inverso):** se deshace también el paso que falló por timeout/5xx, porque pudo haberse aplicado. Falla Acceso: revocar → reembolsar → liberar. Falla Pagos: reembolsar → liberar. Falla Espacios por timeout/5xx: liberar. Un 4xx significa que el paso no se aplicó y solo se compensan los anteriores.
+**Recuperación:** al arrancar y periódicamente, las sagas en estado no final se compensan según su `avance` (las operaciones de A son idempotentes).
+
+**Resiliencia (variables de entorno en `docker-compose.yml`):**
+
+| Patrón | Dónde | Configuración por defecto |
+|---|---|---|
+| Timeout | Todas las llamadas a A | `TIMEOUT_S=2.0` |
+| Circuit Breaker | Uno por servicio (espacios, pagos, acceso). Cuentan como fallo: timeout, error de conexión, 5xx. Un 4xx **no** cuenta | `CB_UMBRAL_FALLOS=3` fallos consecutivos → `ABIERTO`; tras `CB_ESPERA_S=10` → `SEMI_ABIERTO` (1 llamada de prueba) → `CERRADO` o `ABIERTO` |
+| Fallback rápido | Con cualquier circuito abierto, el POST responde de inmediato `FALLIDA` sin reservar ni cobrar | — |
+| Bulkhead | Llamadas de avance a Acceso. Sin cola: si está lleno, rechaza y compensa | `BULKHEAD_MAX=5` |
+| Reintentos | Solo compensaciones (no pasan por CB ni bulkhead: siempre se intentan) | `COMPENSACION_REINTENTOS=3` |
+
+**Persistencia propia:** SQLite `/data/orquestador.db` en volumen `orquestador_data` (tablas `sagas` y `transiciones`).
 
 ## 5. Contratos de Persona C — PENDIENTES DE IMPLEMENTACIÓN
 
@@ -121,10 +147,10 @@ Secuencia éxito: `POST espacios/reservas` → `POST pagos/cobros` → `POST acc
 ## 7. Acuerdo pendiente del equipo (revisar antes de dar Paso 0 por firmado)
 
 - [ ] A, B y C confirman nombres de contenedores, puertos y endpoints de este archivo.
-- [ ] B valida la forma de `estado` en POST y GET del orquestador, incluido manejo de saga fallida.
+- [x] B define la forma de `estado` en POST y GET del orquestador (§4); falta visto bueno de A y C.
 - [ ] C define las rutas públicas del Gateway, forma final del BFF y respuesta de autenticación/limitación.
 - [ ] C confirma cómo bloqueará acceso público al endpoint de administración `/admin/falla`.
-- [ ] El equipo acuerda el formato de métricas y el procedimiento de las pruebas de fallo.
+- [ ] El equipo acuerda el formato de métricas (propuesta de B en §4) y el procedimiento de las pruebas de fallo.
 - [ ] Una vez confirmado, fijar versión del contrato en Git y notificar a todos antes de modificar una interfaz.
 
 > **Regla de integración:** si cambia una ruta, campo o estado, actualizar primero `CONTRATO.md`, después los consumidores. No se debe atribuir implementación a B/C por el solo hecho de incluir sus stubs.
