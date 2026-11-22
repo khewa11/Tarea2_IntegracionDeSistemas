@@ -129,11 +129,33 @@ Modos admitidos de `POST /admin/falla`: `ok`, `lento`, `caido`, `error`; `delayM
 
 **Persistencia propia:** SQLite `/data/orquestador.db` en volumen `orquestador_data` (tablas `sagas` y `transiciones`).
 
-## 5. Contratos de Persona C — PENDIENTES DE IMPLEMENTACIÓN
+## 5. Contratos de Persona C — IMPLEMENTADOS (v1.0)
 
-- **Gateway**, puerto `8080`: único acceso externo. Valida JWT HS256, aplica rate limiting por cliente y enruta al orquestador y al BFF; sin lógica de negocio. **Las rutas públicas exactas deberán confirmarse con C**; se recomienda conservar las rutas internas para simplificar pruebas.
-- **BFF**, puerto `3000`: `GET /bff/mi-reserva/{sagaId}`. Debe componer en **una sola respuesta** la información de al menos dos servicios; se recomienda Espacios, Pagos y Acceso. Ante timeout/502/503 de Acceso, responder igual con datos existentes y marcar la sección de acceso como `no_disponible` (nombre del campo y estructura final por concretar con C).
-- Solo se habilita `GET /health` en los placeholders actuales; las rutas de negocio responden `501 PENDIENTE_IMPLEMENTACION`. **Un contenedor healthy no significa que el módulo de B/C ya esté listo.**
+### 5.1 API Gateway (`http://gateway:8080`, publicado en `127.0.0.1:8080`)
+
+| Método | Ruta pública | Autenticación | Destino / Comportamiento |
+|---|---|---|---|
+| `GET` | `/health` | Pública | `200 {"servicio":"gateway","estado":"ok","implementado":true,"jwtConfigurado":true}` |
+| `POST` | `/auth/token` | Pública | Recibe `{"clienteId":"web-demo"}` y emite `200 {"access_token":"<jwt>","token_type":"Bearer","expires_in":7200}` (HS256) |
+| `POST` | `/reservas-estacionamiento` | `Bearer <jwt>` | Proxy puro a `http://orquestador:4000/reservas-estacionamiento` |
+| `GET` | `/reservas-estacionamiento/{sagaId}` | `Bearer <jwt>` | Proxy puro a `http://orquestador:4000/reservas-estacionamiento/{sagaId}` |
+| `GET` | `/metrics` | `Bearer <jwt>` | Proxy puro a `http://orquestador:4000/metrics` |
+| `GET` | `/bff/mi-reserva/{sagaId}` | `Bearer <jwt>` | Proxy puro a `http://bff:3000/bff/mi-reserva/{sagaId}` |
+| `GET` | `/bff/dashboard` | `Bearer <jwt>` | Proxy puro a `http://bff:3000/bff/dashboard` |
+| `ANY` | `*/admin/falla*` | Bloqueada | Rechazo explícito `403 {"error":"FORBIDDEN_ADMIN_ENDPOINT"}` antes de enrutar |
+
+- **Errores de seguridad / control de tráfico en Gateway:**
+  - `401 {"error":"TOKEN_FALTANTE_O_INVALIDO"}` / `TOKEN_INVALIDO` / `TOKEN_EXPIRADO`.
+  - `429 {"error":"RATE_LIMIT_EXCEEDED","limitePorVentana":40}` (ventana deslizante de 60s por `sub` del JWT).
+  - `502 {"error":"BAD_GATEWAY","detalle":"Servicio interno no disponible"}` si el servicio interno no responde.
+
+### 5.2 BFF Web (`http://bff:3000`, interno en red Docker)
+
+| Método | Ruta | Composición / Salida |
+|---|---|---|
+| `GET` | `/health` | `200 {"servicio":"bff","estado":"ok","implementado":true}` |
+| `GET` | `/bff/mi-reserva/{sagaId}` | Consulta en paralelo (`asyncio.gather`) `orquestador`, `espacios`, `pagos` y `acceso` (timeout 1.2s). Devuelve `200 {"sagaId":...,"estadoGeneral":...,"motivo":...,"espacio":{...},"pago":{...},"acceso":{...},"degradacionActiva":bool}` o `404 RESERVA_NO_ENCONTRADA`. Si `acceso` falla o tarda >1.2s, degrada con `acceso: {"estado":"no_disponible","motivo":...}` y `degradacionActiva: true`. |
+| `GET` | `/bff/dashboard` | Agrega catálogo (`espacios:5001/espacios`) + métricas (`orquestador:4000/metrics`): `200 {"espacios":[...],"metricasSistema":{...}}` (o `"no_disponible"` por bloque ante fallo). |
 
 ## 6. Matriz de responsabilidades (no duplicar patrones)
 
@@ -148,8 +170,8 @@ Modos admitidos de `POST /admin/falla`: `ok`, `lento`, `caido`, `error`; `delayM
 
 - [ ] A, B y C confirman nombres de contenedores, puertos y endpoints de este archivo.
 - [x] B define la forma de `estado` en POST y GET del orquestador (§4); falta visto bueno de A y C.
-- [ ] C define las rutas públicas del Gateway, forma final del BFF y respuesta de autenticación/limitación.
-- [ ] C confirma cómo bloqueará acceso público al endpoint de administración `/admin/falla`.
+- [x] C define las rutas públicas del Gateway, forma final del BFF y respuesta de autenticación/limitación (§5).
+- [x] C confirma cómo bloqueará acceso público al endpoint de administración `/admin/falla` (HTTP 403 explícito en Gateway, §5.1).
 - [ ] El equipo acuerda el formato de métricas (propuesta de B en §4) y el procedimiento de las pruebas de fallo.
 - [ ] Una vez confirmado, fijar versión del contrato en Git y notificar a todos antes de modificar una interfaz.
 
