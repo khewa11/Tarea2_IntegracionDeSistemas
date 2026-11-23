@@ -1,0 +1,52 @@
+# Servicios internos de Persona A. Integrar estas definiciones en el compose común.
+# No se publica ninguno de los tres puertos al exterior.
+services:
+  espacios:
+    build:
+      context: .
+      dockerfile: espacios/Dockerfile
+      args: {SERVICE: espacios}
+    environment: {SERVICE: espacios, PORT: '5001', DB_PATH: /data/espacios.db}
+    expose: ['5001']
+    volumes: ['espacios_data:/data']
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:5001/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  pagos:
+    build:
+      context: .
+      dockerfile: pagos/Dockerfile
+      args: {SERVICE: pagos}
+    environment: {SERVICE: pagos, PORT: '5002', DB_PATH: /data/pagos.db}
+    expose: ['5002']
+    volumes: ['pagos_data:/data']
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:5002/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  acceso:
+    build:
+      context: .
+      dockerfile: acceso/Dockerfile
+      args: {SERVICE: acceso}
+    environment: {SERVICE: acceso, PORT: '5003', DB_PATH: /data/acceso.db}
+    expose: ['5003']
+    volumes: ['acceso_data:/data']
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:5003/health",timeout=2)']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  espacios_data:
+  pagos_data:
+  acceso_data:
