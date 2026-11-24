@@ -1,6 +1,6 @@
 # CONTRATO COMÚN — Integración de Sistemas, Unidad 3 · Forma C
 
-**Versión:** 1.1 — integración de las tres ramas (pendiente de aprobación del equipo)  
+**Versión:** 1.2 — integración de las tres ramas + pasarela Webpay Plus (integración) y demo web (pendiente de aprobación del equipo)  
 **Estado:** propuesta técnica lista para revisión del equipo; **no se presenta como aprobada por B y C**.  
 **Documento base:** «Encargo Unidad 3 — Separación de responsabilidades (Forma C)», Paso 0 y tabla de endpoints.
 
@@ -67,6 +67,23 @@ Catálogo de demostración: `E-001` a `E-010`. Reserva de un espacio ocupada por
 
 `monto` es un número positivo, máximo dos decimales. Se guarda como entero en centavos de la **moneda simulada CLP**; `monto` de respuesta es texto decimal, no `float`. Cobro, referencia y reembolso son **simulados**, no transferencias bancarias reales. Nunca se reembolsa dos veces por reintentar el mismo `sagaId`.
 
+#### 3.2.1 Pasarela adaptable (`PASARELA=simulada|webpay`)
+
+Pagos usa el patrón Adaptador (`pagos/pasarelas.py`): `PasarelaSimulada` (defecto; contrato de la tabla anterior **sin cambios**, sin internet) y `PasarelaWebpay` (Transbank Webpay Plus, SDK oficial `transbank-sdk`, **solo ambiente de integración**). Variables: `TBK_ENV` (solo `integracion`), `TBK_COMMERCE_CODE`, `TBK_API_KEY` (vacías = credenciales públicas de integración del SDK), `TBK_TIMEOUT_S`, `PAGOS_RETURN_URL` (obligatoria con webpay).
+
+Con `PASARELA=webpay` el cobro es asíncrono:
+
+| Método | Ruta | Entrada | Salida |
+|---|---|---|---|
+| `POST` | `/cobros` | `{"sagaId":"S-1","monto":4000}` (CLP entero) | `202 {"sagaId","monto","moneda","estado":"PENDIENTE","referenciaPasarela","token","url","buyOrder"}`; `422 MONTO_CLP_ENTERO`; `502/504 PASARELA_NO_DISPONIBLE` (no se cachea) |
+| `POST` | `/cobros/{sagaId}/confirmar` | `{"token":"<token_ws>"}` | `200 {"estado":"COBRADO"\|"RECHAZADO","estadoPasarela","responseCode","authorizationCode",...}`; `409 SAGA_COMPENSADA` / `TOKEN_NO_CORRESPONDE` / `COBRO_NO_PENDIENTE`; `404`; `502/504` |
+| `POST` | `/cobros/{sagaId}/reembolso` | Vacía | `200 {"estado": "REEMBOLSADO"\|"ANULADO"\|"RECHAZADO"\|"SIN_COBRO"}`; `502/504` si Webpay no responde (no se cachea, el orquestador reintenta) |
+
+- `buy_order` se deriva del `sagaId` (igual si cabe en 26 caracteres; si no, hash estable de 26).
+- **COBRADO** solo si Webpay responde `status=AUTHORIZED` y `response_code=0`; cualquier otro resultado es **RECHAZADO**.
+- **Reembolso:** `COBRADO` → `refund` por el monto total → `REEMBOLSADO`. `PENDIENTE` → se consulta `status`; si ya estaba `AUTHORIZED` se reembolsa, si no queda `ANULADO` (sin llamar a refund). La compensación anticipada sigue dejando lápida: un `confirmar` o `cobrar` posterior responde `409 SAGA_COMPENSADA`.
+- Estados de cobro: `PENDIENTE`, `COBRADO`, `RECHAZADO`, `ANULADO`, `REEMBOLSADO`. La tabla `cobros` se migra automáticamente (columnas `pasarela`, `tbk_token`, `buy_order`, `authorization_code`, `response_code`). Nunca se guardan ni registran datos de tarjeta ni la API key.
+
 ### 3.3 Acceso (`http://acceso:5003`)
 
 | Método | Ruta | Entrada | Salida exitosa / error |
@@ -97,6 +114,7 @@ Modos admitidos de `POST /admin/falla`: `ok`, `lento`, `caido`, `error`; `delayM
 |---|---|---|---|
 | `POST` | `/reservas-estacionamiento` | `{"espacioId":"E-001","patente":"ABCD12","monto":4000}` (+ `sagaId` opcional) | `{"sagaId":"S-…","estado":"…","motivo":null}` |
 | `GET` | `/reservas-estacionamiento/{sagaId}` | — | Saga completa: `sagaId, estado, espacioId, patente, monto, avance, motivo, creadoEn, actualizadoEn, transiciones[]`; `404 SAGA_NO_ENCONTRADA` |
+| `POST` | `/pagos/retorno` | `{"token_ws"?, "TBK_TOKEN"?, "TBK_ORDEN_COMPRA"?, "TBK_ID_SESION"?}` (reenviado por el Gateway) | `{"sagaId","estado","motivo"}`; `404 SAGA_NO_ENCONTRADA`; `422 RETORNO_SIN_TOKEN` |
 | `GET` | `/metrics` | — | JSON con conteo de sagas por estado y, por dependencia: resultados, latencias (promedio/p50/p95/max), Circuit Breaker y Bulkhead |
 | `GET` | `/health` | — | `{"servicio":"orquestador","estado":"ok","implementado":true,"circuitos":{…}}` |
 
@@ -111,7 +129,15 @@ Modos admitidos de `POST /admin/falla`: `ok`, `lento`, `caido`, `error`; `delayM
 | `FALLIDA` | Rechazo rápido sin tocar servicios porque hay un circuito abierto (`CIRCUITO_ABIERTO_<SERVICIO>`) | `503` |
 | `COMPENSADA` | Falló un paso y se deshicieron los anteriores (`ACCESO_TIMEOUT`, `ACCESO_HTTP_5XX_502`, `BULKHEAD_LLENO_ACCESO`, …) | `503` |
 | `COMPENSACION_PENDIENTE` | Alguna compensación no se pudo aplicar; se reintenta cada `RECUPERACION_INTERVALO_S` | `503` |
+| `PAGO_PENDIENTE` | Solo con pasarela asíncrona (Webpay): espacio reservado, esperando que el usuario pague. La respuesta agrega `"pago":{"token","url"}` | `202` |
 | `INICIADA`, `ESPACIO_RESERVADO`, `PAGO_COBRADO`, `COMPENSANDO` | Intermedios (visibles en GET) | `202` si se repite un `sagaId` en curso |
+
+**Flujo con Webpay:** reservar → iniciar cobro (`PAGO_PENDIENTE`, `avance=COBRAR`) → *el usuario paga en Webpay* → `POST /pagos/retorno`:
+- `token_ws` → `POST pagos/cobros/{sagaId}/confirmar`; `COBRADO` → `PAGO_COBRADO` → habilitar Acceso (mismos timeout/CB/Bulkhead) → `COMPLETADA`; `RECHAZADO` → compensa con motivo `PAGO_RECHAZADO`.
+- `TBK_TOKEN` (usuario anuló) → `PAGO_ANULADO`; solo `TBK_ORDEN_COMPRA` (formulario vencido) → `PAGO_EXPIRADO_WEBPAY`.
+- Sin retorno en `PAGO_TIMEOUT_S` (defecto 300 s) → la recuperación compensa con `PAGO_TIMEOUT`.
+- Las compensaciones de pago son `REEMBOLSAR` (anula o reembolsa según el estado del cobro) → `LIBERAR`. Un retorno repetido devuelve el estado vigente sin repetir efectos. Timeout/5xx al confirmar compensa con `PAGOS_TIMEOUT`/`PAGOS_HTTP_5XX_*`.
+- `PAGOS_TIMEOUT_S` (defecto = `TIMEOUT_S`) fija el timeout hacia Pagos; con webpay debe superar `TBK_TIMEOUT_S`.
 
 **Secuencia:** `POST espacios/reservas` → `POST pagos/cobros` → `POST acceso/habilitaciones`. El estado se persiste **antes** de cada llamada (columna `avance`).
 **Compensación (orden inverso):** se deshace también el paso que falló por timeout/5xx, porque pudo haberse aplicado. Falla Acceso: revocar → reembolsar → liberar. Falla Pagos: reembolsar → liberar. Falla Espacios por timeout/5xx: liberar. Un 4xx significa que el paso no se aplicó y solo se compensan los anteriores.
@@ -143,6 +169,10 @@ Modos admitidos de `POST /admin/falla`: `ok`, `lento`, `caido`, `error`; `delayM
 | `GET` | `/bff/mi-reserva/{sagaId}` | `Bearer <jwt>` | Proxy puro a `http://bff:3000/bff/mi-reserva/{sagaId}` |
 | `GET` | `/bff/dashboard` | `Bearer <jwt>` | Proxy puro a `http://bff:3000/bff/dashboard` |
 | `ANY` | `*/admin/falla*` | Bloqueada | Rechazo explícito `403 {"error":"FORBIDDEN_ADMIN_ENDPOINT"}` antes de enrutar |
+| `GET`/`POST` | `/pagos/retorno` | **Pública** (excepción 1) | Retorno de Webpay: toma solo `token_ws`, `TBK_TOKEN`, `TBK_ORDEN_COMPRA`, `TBK_ID_SESION` (query o formulario), los reenvía a `orquestador:4000/pagos/retorno` y responde `303` a `/bff/demo?sagaId=…` (o `?error=…`). Rate limit por IP |
+| `GET` | `/bff/demo`, `/bff/demo/<archivo>` | **Pública** (excepción 2) | Archivos estáticos de la demo (proxy a BFF). Rutas con `..` no son públicas |
+
+Estas son las **únicas** dos excepciones a la validación JWT. Para probar Webpay localmente se necesita un túnel (p. ej. ngrok) hacia `127.0.0.1:8080` y `PAGOS_RETURN_URL=https://<túnel>/pagos/retorno`.
 
 - **Errores de seguridad / control de tráfico en Gateway:**
   - `401 {"error":"TOKEN_FALTANTE_O_INVALIDO"}` / `TOKEN_INVALIDO` / `TOKEN_EXPIRADO`.
@@ -155,6 +185,7 @@ Modos admitidos de `POST /admin/falla`: `ok`, `lento`, `caido`, `error`; `delayM
 |---|---|---|
 | `GET` | `/health` | `200 {"servicio":"bff","estado":"ok","implementado":true}` |
 | `GET` | `/bff/mi-reserva/{sagaId}` | Consulta en paralelo (`asyncio.gather`) `orquestador`, `espacios`, `pagos` y `acceso` (timeout 1.2s). Devuelve `200 {"sagaId":...,"estadoGeneral":...,"motivo":...,"espacio":{...},"pago":{...},"acceso":{...},"degradacionActiva":bool}` o `404 RESERVA_NO_ENCONTRADA`. Si `acceso` falla o tarda >1.2s, degrada con `acceso: {"estado":"no_disponible","motivo":...}` y `degradacionActiva: true`. |
+| `GET` | `/bff/demo`, `/bff/demo/{index.html,app.js,styles.css}` | Demo web estática (lista blanca de archivos). Con `PAGO_PENDIENTE`, `/bff/mi-reserva/{sagaId}` agrega `pagoPendiente: {"url","token"}` |
 | `GET` | `/bff/dashboard` | Agrega catálogo (`espacios:5001/espacios`) + métricas (`orquestador:4000/metrics`): `200 {"espacios":[...],"metricasSistema":{...}}` (o `"no_disponible"` por bloque ante fallo). |
 
 ## 6. Matriz de responsabilidades (no duplicar patrones)

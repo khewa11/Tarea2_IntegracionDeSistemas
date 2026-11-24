@@ -72,6 +72,10 @@ services:
       BULKHEAD_MAX: '5'
       COMPENSACION_REINTENTOS: '3'
       RECUPERACION_INTERVALO_S: '15'
+      # Pago asíncrono (Webpay): segundos para pagar antes de compensar, y timeout hacia
+      # Pagos (con webpay debe superar TBK_TIMEOUT_S; con simulada se usa TIMEOUT_S).
+      PAGO_TIMEOUT_S: ${PAGO_TIMEOUT_S:-300}
+      PAGOS_TIMEOUT_S: ${PAGOS_TIMEOUT_S:-}
     expose:
       - '4000'
     volumes:
@@ -121,6 +125,15 @@ services:
       SERVICE: pagos
       PORT: '5002'
       DB_PATH: /data/pagos.db
+      # Pasarela: simulada (defecto, sin internet) o webpay (Transbank, solo INTEGRACIÓN).
+      PASARELA: ${PASARELA:-simulada}
+      TBK_ENV: ${TBK_ENV:-integracion}
+      # Vacíos = credenciales públicas de integración incluidas en el SDK oficial.
+      TBK_COMMERCE_CODE: ${TBK_COMMERCE_CODE:-}
+      TBK_API_KEY: ${TBK_API_KEY:-}
+      TBK_TIMEOUT_S: ${TBK_TIMEOUT_S:-8}
+      # URL pública (túnel ngrok) que apunta al gateway: https://<tunel>/pagos/retorno
+      PAGOS_RETURN_URL: ${PAGOS_RETURN_URL:-}
     expose:
       - '5002'
     volumes:

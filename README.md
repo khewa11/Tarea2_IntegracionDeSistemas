@@ -28,6 +28,48 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/metrics -Headers $headers
 
 El endpoint de emisión de JWT es un simulador local para el encargo, no autenticación de usuarios real. No exponer el gateway a Internet. El endpoint interno `/admin/falla` está bloqueado en Gateway; se configura desde el contenedor Acceso. No es necesario exponer puertos internos.
 
+## Demo web
+
+Con el sistema levantado, abrir **http://127.0.0.1:8080/bff/demo**. La página pide sola un JWT de demostración, lista los espacios, permite reservar (espacio, patente y monto) y muestra el resultado consultando el BFF: estado de la saga, espacio, cobro y barrera, con un aviso visible cuando la degradación está activa y un botón **Refrescar**. Con la pasarela simulada (defecto) el resultado aparece de inmediato. Las fallas de Acceso se siguen induciendo por terminal (ver escenarios), nunca desde la web.
+
+## Probar con Webpay (integración)
+
+Por defecto Pagos usa la pasarela **simulada** (sin internet), para que los escenarios de fallas no dependan de la red. Opcionalmente se puede usar **Transbank Webpay Plus en ambiente de INTEGRACIÓN** (no produce cobros reales; el proyecto no admite producción: `TBK_ENV` solo acepta `integracion`). Se usa el SDK oficial `transbank-sdk` con las credenciales públicas de integración (código de comercio `597055555532`), que el SDK trae incluidas.
+
+Webpay redirige el navegador del usuario de vuelta a `PAGOS_RETURN_URL`, por lo que esa URL debe ser alcanzable desde internet: se usa un túnel hacia el gateway (único puerto publicado).
+
+1. Crear el túnel hacia el gateway (requiere cuenta gratuita de ngrok) y copiar la URL `https://…` que muestra:
+   ```
+   ngrok http 8080
+   ```
+2. En `.env` configurar:
+   ```
+   PASARELA=webpay
+   PAGOS_RETURN_URL=https://<subdominio>.ngrok-free.app/pagos/retorno
+   PAGOS_TIMEOUT_S=10
+   ```
+   `TBK_COMMERCE_CODE` y `TBK_API_KEY` pueden quedar vacías (credenciales de integración). `PAGO_TIMEOUT_S` (defecto 300) es el tiempo que la saga espera el pago antes de compensar.
+3. Recrear los servicios afectados: `docker compose up --build -d --wait`.
+4. Abrir la demo **por la URL del túnel**: `https://<subdominio>.ngrok-free.app/bff/demo` (así el retorno vuelve al mismo origen). Si ngrok muestra su página de aviso, aceptar.
+5. Reservar: la saga queda en `PAGO_PENDIENTE` (HTTP 202) y el navegador va al formulario de Webpay. Pagar con una tarjeta de prueba (documentación oficial de Transbank, «Cómo empezar» → *Tarjetas de prueba*):
+
+   | Tarjeta | Número | CVV | Expiración | Resultado |
+   |---|---|---|---|---|
+   | VISA | 4051 8856 0044 6623 | 123 | cualquiera futura | Aprobada |
+   | AMEX | 3700 0000 0002 032 | 1234 | cualquiera futura | Aprobada |
+   | MASTERCARD | 5186 0595 5959 0568 | 123 | cualquiera futura | Rechazada |
+   | Redcompra (débito) | 4051 8842 3993 7763 | — | — | Aprobada |
+   | Redcompra (débito) | 5186 0085 4123 3829 | — | — | Rechazada |
+
+   En la autenticación bancaria usar RUT **11.111.111-1** y clave **123**.
+6. Al volver, el gateway reenvía `token_ws` al orquestador, que confirma el pago (commit) y continúa con Acceso; la página de resultado muestra `COMPLETADA` con el código de autorización. Si se rechaza la tarjeta, se anula el pago en Webpay («Anular compra y volver al comercio») o no se paga en `PAGO_TIMEOUT_S`, la saga compensa liberando el espacio (`PAGO_RECHAZADO`, `PAGO_ANULADO`, `PAGO_TIMEOUT`).
+
+Notas:
+- `/pagos/retorno` y `/bff/demo` son las **únicas** rutas públicas sin JWT; el resto sigue exigiendo JWT y rate limiting, y `/admin/falla` sigue bloqueado.
+- La compensación de un cobro `PENDIENTE` consulta el estado en Webpay: si ya estaba autorizado (por ejemplo, porque se perdió el retorno), se hace `refund` por el total; si no, se marca `ANULADO` y una confirmación posterior se rechaza. **Supuesto no confirmado en la documentación oficial:** la documentación de Webpay Plus no indica qué ocurre con un pago autorizado cuyo commit nunca se ejecuta; si el usuario paga después de vencido `PAGO_TIMEOUT_S`, esa autorización no se confirma ni se reembolsa automáticamente. Revisar en el portal de integración si se prueba ese caso.
+- El tiempo de vida del token de Webpay es de 5 minutos según la documentación, coherente con `PAGO_TIMEOUT_S=300`.
+- Nunca se registran la API key, el token de pago ni datos de tarjeta.
+
 ## Pruebas y experimentos
 
 ```powershell
