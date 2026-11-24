@@ -39,7 +39,9 @@ def test_compose_seis_servicios_y_solo_gateway_publico():
     assert "JWT_SECRET" not in data["services"]["espacios"]["environment"]
     assert "JWT_SECRET" not in data["services"]["pagos"]["environment"]
     assert "JWT_SECRET" not in data["services"]["acceso"]["environment"]
-    assert set(data["volumes"]) == {"espacios_data", "pagos_data", "acceso_data"}
+    assert set(data["volumes"]) == {"espacios_data", "pagos_data", "acceso_data", "orquestador_data"}
+    # Cada servicio con estado usa su propio volumen (la Saga no reutiliza las bases de A).
+    assert data["services"]["orquestador"]["volumes"] == ["orquestador_data:/data"]
 
 
 def test_carpeta_y_contrato_paso0():

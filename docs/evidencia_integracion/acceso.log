@@ -1,0 +1,52 @@
+INFO:     Started server process [997]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:5003 (Press CTRL+C to quit)
+INFO:     127.0.0.1:36486 - "GET /health HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:05.973+00:00","sagaId":null,"servicio":"acceso","paso":"configurar_falla","resultado":"OK","modo":"ok","delayMs":0}
+INFO:     127.0.0.1:36502 - "POST /admin/falla HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.160+00:00","sagaId":"S-a9b953a80a8e4457a1632716af4fd9d6","servicio":"acceso","paso":"habilitar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:36514 - "POST /habilitaciones HTTP/1.1" 201 Created
+INFO:     127.0.0.1:36522 - "GET /habilitaciones/S-a9b953a80a8e4457a1632716af4fd9d6 HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.276+00:00","sagaId":null,"servicio":"acceso","paso":"configurar_falla","resultado":"OK","modo":"error","delayMs":0}
+INFO:     127.0.0.1:36534 - "POST /admin/falla HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.309+00:00","sagaId":"S-495c81015c0c400b9db090e9033ce44a","servicio":"acceso","paso":"habilitar","resultado":"FALLO_INDUCIDO","modo":"error","codigo":502}
+INFO:     127.0.0.1:36514 - "POST /habilitaciones HTTP/1.1" 502 Bad Gateway
+{"timestamp":"2026-11-24T01:59:06.319+00:00","sagaId":"S-495c81015c0c400b9db090e9033ce44a","servicio":"acceso","paso":"revocar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:36514 - "POST /habilitaciones/S-495c81015c0c400b9db090e9033ce44a/revocar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.365+00:00","sagaId":"S-495c81015c0c400b9db090e9033ce44a","servicio":"acceso","paso":"consultar_habilitacion","resultado":"FALLO_INDUCIDO","modo":"error","codigo":502}
+INFO:     127.0.0.1:36550 - "GET /habilitaciones/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 502 Bad Gateway
+{"timestamp":"2026-11-24T01:59:06.384+00:00","sagaId":null,"servicio":"acceso","paso":"configurar_falla","resultado":"OK","modo":"ok","delayMs":0}
+INFO:     127.0.0.1:36564 - "POST /admin/falla HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36576 - "GET /habilitaciones/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.479+00:00","sagaId":null,"servicio":"acceso","paso":"configurar_falla","resultado":"OK","modo":"lento","delayMs":3500}
+INFO:     127.0.0.1:36584 - "POST /admin/falla HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.625+00:00","sagaId":"S-82a19fe916724b879480e4e2edb2918b","servicio":"acceso","paso":"habilitar","resultado":"LENTITUD_INDUCIDA","delayMs":3500}
+{"timestamp":"2026-11-24T01:59:06.644+00:00","sagaId":"S-c0488c4b358b4be6a148a1800e9a7ca5","servicio":"acceso","paso":"habilitar","resultado":"LENTITUD_INDUCIDA","delayMs":3500}
+{"timestamp":"2026-11-24T01:59:06.668+00:00","sagaId":"S-cc4f2eb826234354a1aa034cc2db2049","servicio":"acceso","paso":"habilitar","resultado":"LENTITUD_INDUCIDA","delayMs":3500}
+{"timestamp":"2026-11-24T01:59:06.677+00:00","sagaId":"S-ec5dc888cf6f4ac4a55d660e4d7f20b3","servicio":"acceso","paso":"habilitar","resultado":"LENTITUD_INDUCIDA","delayMs":3500}
+{"timestamp":"2026-11-24T01:59:06.683+00:00","sagaId":"S-200e0de879f54146b325b31048c5ea77","servicio":"acceso","paso":"habilitar","resultado":"LENTITUD_INDUCIDA","delayMs":3500}
+{"timestamp":"2026-11-24T01:59:08.626+00:00","sagaId":"S-82a19fe916724b879480e4e2edb2918b","servicio":"acceso","paso":"revocar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:36624 - "POST /habilitaciones/S-82a19fe916724b879480e4e2edb2918b/revocar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.658+00:00","sagaId":"S-c0488c4b358b4be6a148a1800e9a7ca5","servicio":"acceso","paso":"revocar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:36624 - "POST /habilitaciones/S-c0488c4b358b4be6a148a1800e9a7ca5/revocar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.679+00:00","sagaId":"S-ec5dc888cf6f4ac4a55d660e4d7f20b3","servicio":"acceso","paso":"revocar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:36624 - "POST /habilitaciones/S-ec5dc888cf6f4ac4a55d660e4d7f20b3/revocar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.685+00:00","sagaId":"S-cc4f2eb826234354a1aa034cc2db2049","servicio":"acceso","paso":"revocar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:36628 - "POST /habilitaciones/S-cc4f2eb826234354a1aa034cc2db2049/revocar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.697+00:00","sagaId":"S-200e0de879f54146b325b31048c5ea77","servicio":"acceso","paso":"revocar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:36644 - "POST /habilitaciones/S-200e0de879f54146b325b31048c5ea77/revocar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.785+00:00","sagaId":null,"servicio":"acceso","paso":"configurar_falla","resultado":"OK","modo":"caido","delayMs":0}
+INFO:     127.0.0.1:36646 - "POST /admin/falla HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.886+00:00","sagaId":null,"servicio":"acceso","paso":"configurar_falla","resultado":"OK","modo":"ok","delayMs":0}
+INFO:     127.0.0.1:36658 - "POST /admin/falla HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for background tasks to complete. (CTRL+C to force quit)
+{"timestamp":"2026-11-24T01:59:10.128+00:00","sagaId":"S-82a19fe916724b879480e4e2edb2918b","servicio":"acceso","paso":"habilitar","resultado":"FALLO","codigo":409,"idempotente":false}
+{"timestamp":"2026-11-24T01:59:10.147+00:00","sagaId":"S-c0488c4b358b4be6a148a1800e9a7ca5","servicio":"acceso","paso":"habilitar","resultado":"FALLO","codigo":409,"idempotente":false}
+{"timestamp":"2026-11-24T01:59:10.173+00:00","sagaId":"S-cc4f2eb826234354a1aa034cc2db2049","servicio":"acceso","paso":"habilitar","resultado":"FALLO","codigo":409,"idempotente":false}
+{"timestamp":"2026-11-24T01:59:10.180+00:00","sagaId":"S-ec5dc888cf6f4ac4a55d660e4d7f20b3","servicio":"acceso","paso":"habilitar","resultado":"FALLO","codigo":409,"idempotente":false}
+{"timestamp":"2026-11-24T01:59:10.187+00:00","sagaId":"S-200e0de879f54146b325b31048c5ea77","servicio":"acceso","paso":"habilitar","resultado":"FALLO","codigo":409,"idempotente":false}
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [997]

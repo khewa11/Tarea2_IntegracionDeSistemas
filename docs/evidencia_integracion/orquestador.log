@@ -1,0 +1,134 @@
+INFO:     Started server process [998]
+INFO:     Waiting for application startup.
+{"timestamp": "2026-11-24T01:59:04.741+00:00", "sagaId": null, "servicio": "orquestador", "paso": "arranque", "resultado": "ok", "config": {"db_path": "/tmp/tmps7lio00g/orquestador.db", "espacios_url": "http://127.0.0.1:5001", "pagos_url": "http://127.0.0.1:5002", "acceso_url": "http://127.0.0.1:5003", "timeout_s": 2.0, "cb_umbral_fallos": 3, "cb_espera_s": 10.0, "bulkhead_max": 5, "compensacion_reintentos": 3, "compensacion_pausa_s": 0.3, "recuperacion_intervalo_s": 15.0}}
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:4000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52226 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52242 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52256 - "GET /metrics HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.126+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-001"}
+{"timestamp": "2026-11-24T01:59:06.142+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 16.0}
+{"timestamp": "2026-11-24T01:59:06.144+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.151+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 6.9}
+{"timestamp": "2026-11-24T01:59:06.154+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.162+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "ok", "destino": "acceso", "codigo": 201, "duracionMs": 8.0}
+{"timestamp": "2026-11-24T01:59:06.165+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "COMPLETADA"}
+INFO:     127.0.0.1:52270 - "POST /reservas-estacionamiento HTTP/1.1" 201 Created
+INFO:     127.0.0.1:52280 - "GET /reservas-estacionamiento/S-a9b953a80a8e4457a1632716af4fd9d6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52294 - "POST /reservas-estacionamiento HTTP/1.1" 201 Created
+{"timestamp": "2026-11-24T01:59:06.225+00:00", "sagaId": "S-c08f14e48f11412492f7ff232132e126", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-001"}
+{"timestamp": "2026-11-24T01:59:06.232+00:00", "sagaId": "S-c08f14e48f11412492f7ff232132e126", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "rechazado", "destino": "espacios", "codigo": 409, "error": "ESPACIO_OCUPADO", "duracionMs": 7.1}
+{"timestamp": "2026-11-24T01:59:06.235+00:00", "sagaId": "S-c08f14e48f11412492f7ff232132e126", "servicio": "orquestador", "paso": "saga.fin", "resultado": "FALLIDA", "motivo": "ESPACIO_OCUPADO"}
+INFO:     127.0.0.1:52302 - "POST /reservas-estacionamiento HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:52304 - "GET /metrics HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.291+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-002"}
+{"timestamp": "2026-11-24T01:59:06.296+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 5.0}
+{"timestamp": "2026-11-24T01:59:06.299+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.305+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 5.1}
+{"timestamp": "2026-11-24T01:59:06.307+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.310+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "http_5xx", "destino": "acceso", "codigo": 502, "duracionMs": 2.8, "circuito": "CERRADO"}
+{"timestamp": "2026-11-24T01:59:06.314+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "saga.compensacion_inicio", "resultado": "COMPENSANDO", "motivo": "ACCESO_HTTP_5XX_502", "avance": "HABILITAR"}
+{"timestamp": "2026-11-24T01:59:06.319+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "acceso.revocar", "resultado": "ok", "destino": "acceso", "codigo": 200, "duracionMs": 5.8}
+{"timestamp": "2026-11-24T01:59:06.327+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "pagos.reembolsar", "resultado": "ok", "destino": "pagos", "codigo": 200, "duracionMs": 5.0}
+{"timestamp": "2026-11-24T01:59:06.336+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "espacios.liberar", "resultado": "ok", "destino": "espacios", "codigo": 200, "duracionMs": 4.7}
+{"timestamp": "2026-11-24T01:59:06.340+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "orquestador", "paso": "saga.fin", "resultado": "COMPENSADA", "motivo": "ACCESO_HTTP_5XX_502"}
+INFO:     127.0.0.1:52310 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:52318 - "GET /reservas-estacionamiento/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52322 - "GET /reservas-estacionamiento/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52336 - "GET /reservas-estacionamiento/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52350 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52366 - "GET /metrics HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.572+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-002"}
+{"timestamp": "2026-11-24T01:59:06.576+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-003"}
+{"timestamp": "2026-11-24T01:59:06.580+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-004"}
+{"timestamp": "2026-11-24T01:59:06.584+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-005"}
+{"timestamp": "2026-11-24T01:59:06.588+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-006"}
+{"timestamp": "2026-11-24T01:59:06.591+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-007"}
+{"timestamp": "2026-11-24T01:59:06.594+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "saga.inicio", "resultado": "INICIADA", "espacioId": "E-008"}
+{"timestamp": "2026-11-24T01:59:06.601+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 28.9}
+{"timestamp": "2026-11-24T01:59:06.603+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.612+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 8.4}
+{"timestamp": "2026-11-24T01:59:06.616+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.618+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 42.2}
+{"timestamp": "2026-11-24T01:59:06.622+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.624+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 43.4}
+{"timestamp": "2026-11-24T01:59:06.628+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.628+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 36.9}
+{"timestamp": "2026-11-24T01:59:06.632+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.633+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 48.7}
+{"timestamp": "2026-11-24T01:59:06.636+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.637+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 15.5}
+{"timestamp": "2026-11-24T01:59:06.640+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.648+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 59.5}
+{"timestamp": "2026-11-24T01:59:06.650+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.652+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 23.9}
+{"timestamp": "2026-11-24T01:59:06.654+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.656+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 19.8}
+{"timestamp": "2026-11-24T01:59:06.659+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.660+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 10.0}
+{"timestamp": "2026-11-24T01:59:06.664+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.670+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 38.2}
+{"timestamp": "2026-11-24T01:59:06.672+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.672+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "bulkhead_lleno", "destino": "acceso"}
+{"timestamp": "2026-11-24T01:59:06.675+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "saga.compensacion_inicio", "resultado": "COMPENSANDO", "motivo": "BULKHEAD_LLENO_ACCESO", "avance": "COBRAR"}
+{"timestamp": "2026-11-24T01:59:06.676+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "espacios.reservar", "resultado": "ok", "destino": "espacios", "codigo": 201, "duracionMs": 81.8}
+{"timestamp": "2026-11-24T01:59:06.680+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "ESPACIO_RESERVADO"}
+{"timestamp": "2026-11-24T01:59:06.688+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "pagos.cobrar", "resultado": "ok", "destino": "pagos", "codigo": 201, "duracionMs": 8.0}
+{"timestamp": "2026-11-24T01:59:06.693+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "saga.transicion", "resultado": "PAGO_COBRADO"}
+{"timestamp": "2026-11-24T01:59:06.693+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "bulkhead_lleno", "destino": "acceso"}
+{"timestamp": "2026-11-24T01:59:06.697+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "saga.compensacion_inicio", "resultado": "COMPENSANDO", "motivo": "BULKHEAD_LLENO_ACCESO", "avance": "COBRAR"}
+{"timestamp": "2026-11-24T01:59:06.699+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "pagos.reembolsar", "resultado": "ok", "destino": "pagos", "codigo": 200, "duracionMs": 24.1}
+{"timestamp": "2026-11-24T01:59:06.711+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "pagos.reembolsar", "resultado": "ok", "destino": "pagos", "codigo": 200, "duracionMs": 13.9}
+{"timestamp": "2026-11-24T01:59:06.715+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "espacios.liberar", "resultado": "ok", "destino": "espacios", "codigo": 200, "duracionMs": 12.5}
+{"timestamp": "2026-11-24T01:59:06.721+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "orquestador", "paso": "saga.fin", "resultado": "COMPENSADA", "motivo": "BULKHEAD_LLENO_ACCESO"}
+INFO:     127.0.0.1:52426 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:06.728+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "espacios.liberar", "resultado": "ok", "destino": "espacios", "codigo": 200, "duracionMs": 14.7}
+{"timestamp": "2026-11-24T01:59:06.736+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "orquestador", "paso": "saga.fin", "resultado": "COMPENSADA", "motivo": "BULKHEAD_LLENO_ACCESO"}
+INFO:     127.0.0.1:52442 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:52456 - "GET /metrics HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:08.617+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "timeout", "destino": "acceso", "duracionMs": 2000.9, "circuito": "CERRADO"}
+{"timestamp": "2026-11-24T01:59:08.621+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "saga.compensacion_inicio", "resultado": "COMPENSANDO", "motivo": "ACCESO_TIMEOUT", "avance": "HABILITAR"}
+{"timestamp": "2026-11-24T01:59:08.627+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "acceso.revocar", "resultado": "ok", "destino": "acceso", "codigo": 200, "duracionMs": 6.0}
+{"timestamp": "2026-11-24T01:59:08.636+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "pagos.reembolsar", "resultado": "ok", "destino": "pagos", "codigo": 200, "duracionMs": 5.5}
+{"timestamp": "2026-11-24T01:59:08.641+00:00", "sagaId": null, "servicio": "orquestador", "paso": "circuit_breaker", "resultado": "ABIERTO", "destino": "acceso", "anterior": "CERRADO"}
+{"timestamp": "2026-11-24T01:59:08.641+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "timeout", "destino": "acceso", "duracionMs": 2000.9, "circuito": "ABIERTO"}
+{"timestamp": "2026-11-24T01:59:08.646+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "saga.compensacion_inicio", "resultado": "COMPENSANDO", "motivo": "ACCESO_TIMEOUT", "avance": "HABILITAR"}
+{"timestamp": "2026-11-24T01:59:08.647+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "espacios.liberar", "resultado": "ok", "destino": "espacios", "codigo": 200, "duracionMs": 8.5}
+{"timestamp": "2026-11-24T01:59:08.652+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "orquestador", "paso": "saga.fin", "resultado": "COMPENSADA", "motivo": "ACCESO_TIMEOUT"}
+INFO:     127.0.0.1:52376 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.656+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "timeout", "destino": "acceso", "duracionMs": 2001.4, "circuito": "ABIERTO"}
+{"timestamp": "2026-11-24T01:59:08.660+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "saga.compensacion_inicio", "resultado": "COMPENSANDO", "motivo": "ACCESO_TIMEOUT", "avance": "HABILITAR"}
+{"timestamp": "2026-11-24T01:59:08.662+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "acceso.revocar", "resultado": "ok", "destino": "acceso", "codigo": 200, "duracionMs": 16.2}
+{"timestamp": "2026-11-24T01:59:08.666+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "timeout", "destino": "acceso", "duracionMs": 2006.5, "circuito": "ABIERTO"}
+{"timestamp": "2026-11-24T01:59:08.668+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "saga.compensacion_inicio", "resultado": "COMPENSANDO", "motivo": "ACCESO_TIMEOUT", "avance": "HABILITAR"}
+{"timestamp": "2026-11-24T01:59:08.670+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "acceso.habilitar", "resultado": "timeout", "destino": "acceso", "duracionMs": 2005.6, "circuito": "ABIERTO"}
+{"timestamp": "2026-11-24T01:59:08.674+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "saga.compensacion_inicio", "resultado": "COMPENSANDO", "motivo": "ACCESO_TIMEOUT", "avance": "HABILITAR"}
+{"timestamp": "2026-11-24T01:59:08.676+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "pagos.reembolsar", "resultado": "ok", "destino": "pagos", "codigo": 200, "duracionMs": 11.7}
+{"timestamp": "2026-11-24T01:59:08.682+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "acceso.revocar", "resultado": "ok", "destino": "acceso", "codigo": 200, "duracionMs": 13.7}
+{"timestamp": "2026-11-24T01:59:08.688+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "acceso.revocar", "resultado": "ok", "destino": "acceso", "codigo": 200, "duracionMs": 27.4}
+{"timestamp": "2026-11-24T01:59:08.694+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "espacios.liberar", "resultado": "ok", "destino": "espacios", "codigo": 200, "duracionMs": 14.2}
+{"timestamp": "2026-11-24T01:59:08.703+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "orquestador", "paso": "saga.fin", "resultado": "COMPENSADA", "motivo": "ACCESO_TIMEOUT"}
+INFO:     127.0.0.1:52392 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.705+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "acceso.revocar", "resultado": "ok", "destino": "acceso", "codigo": 200, "duracionMs": 30.9}
+{"timestamp": "2026-11-24T01:59:08.711+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "pagos.reembolsar", "resultado": "ok", "destino": "pagos", "codigo": 200, "duracionMs": 25.2}
+{"timestamp": "2026-11-24T01:59:08.716+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "pagos.reembolsar", "resultado": "ok", "destino": "pagos", "codigo": 200, "duracionMs": 24.5}
+{"timestamp": "2026-11-24T01:59:08.728+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "espacios.liberar", "resultado": "ok", "destino": "espacios", "codigo": 200, "duracionMs": 7.8}
+{"timestamp": "2026-11-24T01:59:08.734+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "orquestador", "paso": "saga.fin", "resultado": "COMPENSADA", "motivo": "ACCESO_TIMEOUT"}
+INFO:     127.0.0.1:52408 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.735+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "pagos.reembolsar", "resultado": "ok", "destino": "pagos", "codigo": 200, "duracionMs": 25.3}
+{"timestamp": "2026-11-24T01:59:08.740+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "espacios.liberar", "resultado": "ok", "destino": "espacios", "codigo": 200, "duracionMs": 25.7}
+{"timestamp": "2026-11-24T01:59:08.745+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "orquestador", "paso": "saga.fin", "resultado": "COMPENSADA", "motivo": "ACCESO_TIMEOUT"}
+INFO:     127.0.0.1:52412 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.750+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "espacios.liberar", "resultado": "ok", "destino": "espacios", "codigo": 200, "duracionMs": 11.7}
+{"timestamp": "2026-11-24T01:59:08.755+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "orquestador", "paso": "saga.fin", "resultado": "COMPENSADA", "motivo": "ACCESO_TIMEOUT"}
+INFO:     127.0.0.1:52422 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:52472 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52480 - "GET /metrics HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:08.832+00:00", "sagaId": "S-209c9172d3d74b6581fd5d77ee28ade4", "servicio": "orquestador", "paso": "saga.rechazo_rapido", "resultado": "FALLIDA", "motivo": "CIRCUITO_ABIERTO_ACCESO"}
+INFO:     127.0.0.1:52496 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:52510 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52516 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [998]
