@@ -34,40 +34,82 @@ Con el sistema levantado, abrir **http://127.0.0.1:8080/bff/demo**. La página p
 
 ## Probar con Webpay (integración)
 
-Por defecto Pagos usa la pasarela **simulada** (sin internet), para que los escenarios de fallas no dependan de la red. Opcionalmente se puede usar **Transbank Webpay Plus en ambiente de INTEGRACIÓN** (no produce cobros reales; el proyecto no admite producción: `TBK_ENV` solo acepta `integracion`). Se usa el SDK oficial `transbank-sdk` con las credenciales públicas de integración (código de comercio `597055555532`), que el SDK trae incluidas.
+Por defecto Pagos usa la pasarela **simulada** (sin internet), para que los escenarios de fallas no dependan de la red. Esta sección explica cómo simular un pago real con **Transbank Webpay Plus en ambiente de INTEGRACIÓN**: no se cobra dinero real y el proyecto no admite producción (`TBK_ENV` solo acepta `integracion`). Se usa el SDK oficial `transbank-sdk` con las credenciales públicas de integración (código de comercio `597055555532`), que el SDK ya trae, así que no hay que configurar credenciales.
 
-Webpay redirige el navegador del usuario de vuelta a `PAGOS_RETURN_URL`, por lo que esa URL debe ser alcanzable desde internet: se usa un túnel hacia el gateway (único puerto publicado).
+Webpay devuelve al usuario a `PAGOS_RETURN_URL` cuando termina de pagar. Para que esa dirección sea pública se usa **ngrok**, un túnel hacia el gateway (el único puerto publicado, 8080).
 
-1. Crear el túnel hacia el gateway (requiere cuenta gratuita de ngrok) y copiar la URL `https://…` que muestra:
+### Preparación (una sola vez)
+
+1. Crear una cuenta gratuita en [ngrok.com](https://ngrok.com) e instalar ngrok según su página de descarga.
+2. Registrar el token de la cuenta (aparece en el panel de ngrok):
+   ```
+   ngrok config add-authtoken <TU_TOKEN_DE_NGROK>
+   ```
+
+### Pasos
+
+1. Levantar el sistema normalmente (`docker compose up --build -d --wait`).
+2. En **otra terminal**, abrir el túnel y dejarlo abierto:
    ```
    ngrok http 8080
    ```
-2. En `.env` configurar:
+   Copiar la URL `https://…` de la línea **Forwarding**, por ejemplo `https://abcd-1234.ngrok-free.app`.
+3. Agregar al final de `.env` (reemplazando la URL por la copiada):
    ```
    PASARELA=webpay
-   PAGOS_RETURN_URL=https://<subdominio>.ngrok-free.app/pagos/retorno
+   PAGOS_RETURN_URL=https://abcd-1234.ngrok-free.app/pagos/retorno
    PAGOS_TIMEOUT_S=10
    ```
-   `TBK_COMMERCE_CODE` y `TBK_API_KEY` pueden quedar vacías (credenciales de integración). `PAGO_TIMEOUT_S` (defecto 300) es el tiempo que la saga espera el pago antes de compensar.
-3. Recrear los servicios afectados: `docker compose up --build -d --wait`.
-4. Abrir la demo **por la URL del túnel**: `https://<subdominio>.ngrok-free.app/bff/demo` (así el retorno vuelve al mismo origen). Si ngrok muestra su página de aviso, aceptar.
-5. Reservar: la saga queda en `PAGO_PENDIENTE` (HTTP 202) y el navegador va al formulario de Webpay. Pagar con una tarjeta de prueba (documentación oficial de Transbank, «Cómo empezar» → *Tarjetas de prueba*):
+4. Reiniciar solo los servicios que cambian:
+   ```
+   docker compose up -d --wait pagos orquestador
+   ```
+   Para comprobar el modo: en `docker compose logs pagos`, la última línea con `"paso":"arranque"` debe decir `"pasarela":"WEBPAY_PLUS_INTEGRACION"`.
+5. Abrir la demo **por la URL de ngrok**: `https://abcd-1234.ngrok-free.app/bff/demo`. La primera vez ngrok muestra una página de aviso: pulsar **Visit Site**.
+6. Elegir espacio, patente y monto (entero, por ejemplo `4000`) y pulsar **Reservar**. El navegador va al formulario de Webpay.
 
-   | Tarjeta | Número | CVV | Expiración | Resultado |
-   |---|---|---|---|---|
-   | VISA | 4051 8856 0044 6623 | 123 | cualquiera futura | Aprobada |
-   | AMEX | 3700 0000 0002 032 | 1234 | cualquiera futura | Aprobada |
-   | MASTERCARD | 5186 0595 5959 0568 | 123 | cualquiera futura | Rechazada |
-   | Redcompra (débito) | 4051 8842 3993 7763 | — | — | Aprobada |
-   | Redcompra (débito) | 5186 0085 4123 3829 | — | — | Rechazada |
+### Casos para simular el pago
 
-   En la autenticación bancaria usar RUT **11.111.111-1** y clave **123**.
-6. Al volver, el gateway reenvía `token_ws` al orquestador, que confirma el pago (commit) y continúa con Acceso; la página de resultado muestra `COMPLETADA` con el código de autorización. Si se rechaza la tarjeta, se anula el pago en Webpay («Anular compra y volver al comercio») o no se paga en `PAGO_TIMEOUT_S`, la saga compensa liberando el espacio (`PAGO_RECHAZADO`, `PAGO_ANULADO`, `PAGO_TIMEOUT`).
+Tarjetas de prueba de la documentación oficial de Transbank («Cómo empezar» → *Tarjetas de prueba*). Cuando Webpay pida autenticación bancaria, usar RUT **11.111.111-1** y clave **123**.
 
-Notas:
+| Caso | Qué hacer en Webpay | Resultado esperado en la demo |
+|---|---|---|
+| Pago aprobado | VISA `4051 8856 0044 6623`, CVV `123`, cualquier fecha futura | `COMPLETADA`; cobro `COBRADO` con código de autorización; barrera `HABILITADA` |
+| Pago rechazado | MASTERCARD `5186 0595 5959 0568`, CVV `123`, cualquier fecha futura | `COMPENSADA` (`PAGO_RECHAZADO`); cobro `RECHAZADO`; espacio `LIBERADA` |
+| Usuario anula | Pulsar «Anular compra y volver al comercio» | `COMPENSADA` (`PAGO_ANULADO`); cobro `ANULADO`; espacio `LIBERADA` |
+| No paga a tiempo | Cerrar la pestaña de Webpay sin pagar y esperar `PAGO_TIMEOUT_S` (300 s por defecto; se revisa cada 15 s) | Consultar el sagaId en la demo: `COMPENSADA` (`PAGO_TIMEOUT`); espacio `LIBERADA` |
+
+Otras tarjetas válidas: AMEX `3700 0000 0002 032` (CVV `1234`, aprobada) y Redcompra débito `4051 8842 3993 7763` (aprobada) o `5186 0085 4123 3829` (rechazada).
+
+Para ver los pasos de la saga mientras se paga:
+```
+docker compose logs -f orquestador pagos gateway
+```
+Se ven `saga.transicion PAGO_PENDIENTE`, `RETORNO_PAGO`, `pagos.confirmar` y la continuación hacia Acceso o la compensación.
+
+Para que el caso de timeout sea más rápido en una demostración, agregar `PAGO_TIMEOUT_S=60` en `.env` y repetir el paso 4.
+
+### Volver al modo simulado
+
+1. Borrar del `.env` las líneas `PASARELA`, `PAGOS_RETURN_URL` y `PAGOS_TIMEOUT_S` (o poner `PASARELA=simulada`).
+2. `docker compose up -d --wait pagos orquestador`
+3. Cerrar ngrok con `Ctrl+C`.
+
+Hay que volver a la simulada antes de correr `scripts/escenarios.py`, porque esos escenarios esperan el cobro inmediato y no dependen de internet.
+
+### Problemas comunes
+
+- **La URL de ngrok cambió:** en el plan gratuito cambia cada vez que se reinicia ngrok. Actualizar `PAGOS_RETURN_URL` y repetir el paso 4.
+- **Al volver de Webpay aparece la página de aviso de ngrok:** pulsar **Visit Site**; el pago se procesa igual.
+- **La reserva queda `COMPENSADA` con motivo `MONTO_CLP_ENTERO`:** Webpay en CLP no acepta decimales; usar un monto entero.
+- **La reserva responde `503` con motivo `PAGOS_TIMEOUT` o `PAGOS_HTTP_5XX_…`:** Pagos no pudo contactar a Webpay (sin internet o Transbank lento). Revisar `docker compose logs pagos`.
+- **El espacio no aparece libre:** quedó ocupado por una reserva anterior; elegir otro.
+
+### Notas técnicas
+
 - `/pagos/retorno` y `/bff/demo` son las **únicas** rutas públicas sin JWT; el resto sigue exigiendo JWT y rate limiting, y `/admin/falla` sigue bloqueado.
 - La compensación de un cobro `PENDIENTE` consulta el estado en Webpay: si ya estaba autorizado (por ejemplo, porque se perdió el retorno), se hace `refund` por el total; si no, se marca `ANULADO` y una confirmación posterior se rechaza. **Supuesto no confirmado en la documentación oficial:** la documentación de Webpay Plus no indica qué ocurre con un pago autorizado cuyo commit nunca se ejecuta; si el usuario paga después de vencido `PAGO_TIMEOUT_S`, esa autorización no se confirma ni se reembolsa automáticamente. Revisar en el portal de integración si se prueba ese caso.
-- El tiempo de vida del token de Webpay es de 5 minutos según la documentación, coherente con `PAGO_TIMEOUT_S=300`.
+- El token de Webpay dura 5 minutos según la documentación, coherente con `PAGO_TIMEOUT_S=300`.
 - Nunca se registran la API key, el token de pago ni datos de tarjeta.
 
 ## Pruebas y experimentos
