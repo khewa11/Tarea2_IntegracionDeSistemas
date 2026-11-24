@@ -31,6 +31,16 @@ CREATE INDEX IF NOT EXISTS idx_sagas_estado ON sagas(estado);
 """
 
 
+# Columnas agregadas para pagos asíncronos (Webpay). Se agregan con ALTER TABLE si la
+# base viene de una versión anterior; en modo simulado quedan en NULL.
+COLUMNAS_PAGO = {
+    "pago_token": "TEXT",
+    "pago_url": "TEXT",
+    "pago_buy_order": "TEXT",
+    "pago_limite": "REAL",   # epoch (segundos) a partir del cual el pago pendiente expira
+}
+
+
 def ahora() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
@@ -42,6 +52,12 @@ class BaseSagas:
             Path(ruta).parent.mkdir(parents=True, exist_ok=True)
         with self._conexion() as con:
             con.executescript(ESQUEMA)
+            existentes = {f["name"] for f in con.execute("PRAGMA table_info(sagas)")}
+            for nombre, tipo in COLUMNAS_PAGO.items():
+                if nombre not in existentes:
+                    con.execute(f"ALTER TABLE sagas ADD COLUMN {nombre} {tipo}")
+            con.execute("CREATE INDEX IF NOT EXISTS idx_sagas_pago_token ON sagas(pago_token)")
+            con.execute("CREATE INDEX IF NOT EXISTS idx_sagas_pago_buy_order ON sagas(pago_buy_order)")
 
     @contextmanager
     def _conexion(self) -> Iterator[sqlite3.Connection]:
@@ -62,7 +78,8 @@ class BaseSagas:
         with self._conexion() as con:
             try:
                 con.execute(
-                    "INSERT INTO sagas VALUES (?,?,?,?,?,?,?,?,?)",
+                    "INSERT INTO sagas (saga_id, espacio_id, patente, monto, estado, avance, motivo, creado_en,"
+                    " actualizado_en) VALUES (?,?,?,?,?,?,?,?,?)",
                     (saga_id, espacio_id, patente, monto, estado, avance, motivo, ts, ts))
             except sqlite3.IntegrityError:
                 return False
@@ -81,6 +98,21 @@ class BaseSagas:
             con.execute("INSERT INTO transiciones (saga_id, estado, detalle, timestamp) VALUES (?,?,?,?)",
                         (saga_id, estado, detalle or motivo, ts))
 
+    def registrar_pago(self, saga_id: str, token: str, url: str, buy_order: str | None, limite: float) -> None:
+        with self._conexion() as con:
+            con.execute("UPDATE sagas SET pago_token=?, pago_url=?, pago_buy_order=?, pago_limite=? WHERE saga_id=?",
+                        (token, url, buy_order, limite, saga_id))
+
+    def buscar_por_pago(self, token: str | None = None, buy_order: str | None = None) -> str | None:
+        with self._conexion() as con:
+            if token:
+                fila = con.execute("SELECT saga_id FROM sagas WHERE pago_token=?", (token,)).fetchone()
+            elif buy_order:
+                fila = con.execute("SELECT saga_id FROM sagas WHERE pago_buy_order=?", (buy_order,)).fetchone()
+            else:
+                return None
+        return fila["saga_id"] if fila else None
+
     def obtener(self, saga_id: str) -> dict | None:
         with self._conexion() as con:
             fila = con.execute("SELECT * FROM sagas WHERE saga_id=?", (saga_id,)).fetchone()
@@ -89,7 +121,7 @@ class BaseSagas:
             pasos = con.execute(
                 "SELECT estado, detalle, timestamp FROM transiciones WHERE saga_id=? ORDER BY id",
                 (saga_id,)).fetchall()
-        return {
+        saga = {
             "sagaId": fila["saga_id"],
             "estado": fila["estado"],
             "espacioId": fila["espacio_id"],
@@ -101,6 +133,11 @@ class BaseSagas:
             "actualizadoEn": fila["actualizado_en"],
             "transiciones": [dict(p) for p in pasos],
         }
+        if fila["pago_token"]:
+            # Solo sagas con pasarela asíncrona: en modo simulado la respuesta no cambia.
+            saga["pago"] = {"token": fila["pago_token"], "url": fila["pago_url"],
+                            "buyOrder": fila["pago_buy_order"], "limite": fila["pago_limite"]}
+        return saga
 
     def pendientes(self, estados: tuple[str, ...]) -> list[dict]:
         marcas = ",".join("?" * len(estados))

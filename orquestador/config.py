@@ -31,6 +31,10 @@ class Config:
     compensacion_pausa_s: float = 0.3
     # Cada cuántos segundos se reintentan compensaciones pendientes (0 = desactivado).
     recuperacion_intervalo_s: float = 15.0
+    # Pasarela asíncrona (Webpay): tiempo máximo para que el usuario pague antes de compensar.
+    pago_timeout_s: float = 300.0
+    # Timeout específico hacia Pagos (Webpay tarda más que la simulada). None = timeout_s.
+    pagos_timeout_s: float | None = None
 
     @classmethod
     def desde_entorno(cls) -> "Config":
@@ -46,4 +50,6 @@ class Config:
             compensacion_reintentos=_int("COMPENSACION_REINTENTOS", cls.compensacion_reintentos),
             compensacion_pausa_s=_float("COMPENSACION_PAUSA_S", cls.compensacion_pausa_s),
             recuperacion_intervalo_s=_float("RECUPERACION_INTERVALO_S", cls.recuperacion_intervalo_s),
+            pago_timeout_s=_float("PAGO_TIMEOUT_S", cls.pago_timeout_s),
+            pagos_timeout_s=float(os.environ["PAGOS_TIMEOUT_S"]) if os.environ.get("PAGOS_TIMEOUT_S") else None,
         )

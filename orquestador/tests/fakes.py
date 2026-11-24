@@ -89,6 +89,11 @@ def fake_pagos(reg: Registro) -> FastAPI:
     app.state.falla = Falla()
     cobros: dict[str, dict] = {}
     app.state.cobros = cobros
+    # Modo Webpay (pasarela asíncrona): POST /cobros responde 202 PENDIENTE y el cobro se
+    # confirma con POST /cobros/{saga}/confirmar. resultado_pago: AUTHORIZED | FAILED.
+    app.state.webpay = False
+    app.state.resultado_pago = "AUTHORIZED"
+    app.state.commits = 0
 
     @app.post("/cobros")
     async def cobrar(req: Request):
@@ -100,10 +105,36 @@ def fake_pagos(reg: Registro) -> FastAPI:
         if saga in cobros:
             if cobros[saga].get("lapida"):
                 return _err(409, "SAGA_COMPENSADA")
+        elif app.state.webpay:
+            cobros[saga] = {"monto": str(datos["monto"]), "estado": "PENDIENTE", "token": f"tok-{saga}",
+                            "buyOrder": saga[:26]}
         else:
             cobros[saga] = {"monto": str(datos["monto"]), "estado": "COBRADO", "efectos": 1}
+        if cobros[saga]["estado"] == "PENDIENTE" or "token" in cobros[saga]:
+            c = cobros[saga]
+            return JSONResponse({"sagaId": saga, "monto": c["monto"], "moneda": "CLP", "estado": "PENDIENTE",
+                                 "referenciaPasarela": c["buyOrder"], "token": c["token"],
+                                 "url": "https://webpay.test/init", "buyOrder": c["buyOrder"]}, 202)
         return JSONResponse({"sagaId": saga, "monto": str(datos["monto"]), "moneda": "CLP",
                              "estado": "COBRADO", "referenciaPasarela": f"SIM-{saga}"}, 201)
+
+    @app.post("/cobros/{saga}/confirmar")
+    async def confirmar(saga: str, req: Request):
+        datos = await req.json()
+        reg.llamadas.append(("pagos", f"confirmar {saga}"))
+        if (r := await app.state.falla.aplicar()) is not None:
+            return r
+        c = cobros.get(saga)
+        if c is None:
+            return _err(404, "COBRO_NO_ENCONTRADO")
+        if c.get("lapida"):
+            return _err(409, "SAGA_COMPENSADA")
+        if c.get("token") != datos["token"]:
+            return _err(409, "TOKEN_NO_CORRESPONDE")
+        if c["estado"] == "PENDIENTE":
+            app.state.commits += 1
+            c["estado"] = "COBRADO" if app.state.resultado_pago == "AUTHORIZED" else "RECHAZADO"
+        return {"sagaId": saga, "estado": c["estado"], "responseCode": 0 if c["estado"] == "COBRADO" else -1}
 
     @app.post("/cobros/{saga}/reembolso")
     async def reembolsar(saga: str):
@@ -113,8 +144,13 @@ def fake_pagos(reg: Registro) -> FastAPI:
         if saga not in cobros:
             cobros[saga] = {"estado": "REEMBOLSADO", "lapida": True}
             return {"sagaId": saga, "estado": "SIN_COBRO"}
-        cobros[saga]["estado"] = "REEMBOLSADO"
-        return {"sagaId": saga, "estado": "REEMBOLSADO"}
+        c = cobros[saga]
+        c["lapida"] = True
+        if c["estado"] == "PENDIENTE":
+            c["estado"] = "ANULADO"
+        elif c["estado"] == "COBRADO":
+            c["estado"] = "REEMBOLSADO"
+        return {"sagaId": saga, "estado": c["estado"]}
 
     @app.get("/cobros/{saga}")
     async def ver(saga: str):

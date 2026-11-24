@@ -47,8 +47,19 @@ def codigo_http(saga: dict) -> int:
     return 202  # todavía en curso (solo visible al repetir un sagaId en ejecución)
 
 
+class RetornoPago(BaseModel):
+    """Parámetros que Webpay envía al volver al comercio (reenviados por el Gateway)."""
+    token_ws: str | None = Field(default=None, max_length=64)
+    TBK_TOKEN: str | None = Field(default=None, max_length=64)
+    TBK_ORDEN_COMPRA: str | None = Field(default=None, max_length=26)
+    TBK_ID_SESION: str | None = Field(default=None, max_length=61)
+
+
 def resumen(saga: dict) -> dict:
-    return {"sagaId": saga["sagaId"], "estado": saga["estado"], "motivo": saga["motivo"]}
+    datos = {"sagaId": saga["sagaId"], "estado": saga["estado"], "motivo": saga["motivo"]}
+    if saga["estado"] == s.PAGO_PENDIENTE and saga.get("pago"):
+        datos["pago"] = {"token": saga["pago"]["token"], "url": saga["pago"]["url"]}
+    return datos
 
 
 def create_app(config: Config | None = None, transport: httpx.AsyncBaseTransport | None = None,
@@ -70,10 +81,12 @@ def create_app(config: Config | None = None, transport: httpx.AsyncBaseTransport
             orq = s.Orquestador(
                 BaseSagas(config.db_path),
                 dep("espacios", config.espacios_url),
-                dep("pagos", config.pagos_url),
+                Dependencia("pagos", config.pagos_url, http, config.pagos_timeout_s or config.timeout_s,
+                            CircuitBreaker("pagos", config.cb_umbral_fallos, config.cb_espera_s, reloj, al_cambiar)),
                 dep("acceso", config.acceso_url, Bulkhead("acceso", config.bulkhead_max)),
                 config.compensacion_reintentos,
                 config.compensacion_pausa_s,
+                config.pago_timeout_s,
             )
             estado["orq"] = orq
             estado["inicio"] = time.time()
@@ -121,6 +134,30 @@ def create_app(config: Config | None = None, transport: httpx.AsyncBaseTransport
         if saga is None:
             return JSONResponse({"error": "SAGA_NO_ENCONTRADA", "sagaId": saga_id}, status_code=404)
         return saga
+
+    @app.post("/pagos/retorno")
+    async def retorno_pago(datos: RetornoPago):
+        """Retorno de Webpay. Flujo normal: token_ws. Anulación: TBK_TOKEN. Formulario
+        vencido: solo TBK_ORDEN_COMPRA/TBK_ID_SESION. Repetir el retorno es idempotente."""
+        orq: s.Orquestador = estado["orq"]
+        if datos.TBK_TOKEN or (not datos.token_ws and datos.TBK_ORDEN_COMPRA):
+            saga_id = (orq.db.buscar_por_pago(token=datos.TBK_TOKEN) if datos.TBK_TOKEN else None) \
+                or orq.db.buscar_por_pago(buy_order=datos.TBK_ORDEN_COMPRA)
+            accion = "anular"
+        elif datos.token_ws:
+            saga_id = orq.db.buscar_por_pago(token=datos.token_ws)
+            accion = "confirmar"
+        else:
+            return JSONResponse({"error": "RETORNO_SIN_TOKEN"}, status_code=422)
+        if saga_id is None:
+            log("pago.retorno", "NO_ENCONTRADO", None, accion=accion)
+            return JSONResponse({"error": "SAGA_NO_ENCONTRADA"}, status_code=404)
+        if accion == "confirmar":
+            saga = await orq.confirmar_pago(saga_id, datos.token_ws)
+        else:
+            motivo = "PAGO_ANULADO" if datos.TBK_TOKEN else "PAGO_EXPIRADO_WEBPAY"
+            saga = await orq.anular_pago(saga_id, motivo)
+        return resumen(saga)
 
     @app.get("/metrics")
     async def metrics():
