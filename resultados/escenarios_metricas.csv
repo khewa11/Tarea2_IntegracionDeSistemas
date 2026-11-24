@@ -1,0 +1,4 @@
+﻿timestamp_utc,escenario,etapa,url,timeoutSegundos,llamadas,resultados.ok,resultados.http_5xx,latenciaMs.muestras,latenciaMs.promedio,latenciaMs.p50,latenciaMs.p95,latenciaMs.max,circuitBreaker.estado,circuitBreaker.fallosConsecutivos,circuitBreaker.umbralFallos,circuitBreaker.esperaSegundos,circuitBreaker.aperturas,circuitBreaker.rechazos,bulkhead.maximo,bulkhead.enCurso,bulkhead.pico,bulkhead.rechazos,resultados.bulkhead_lleno,resultados.timeout,resultados.circuito_abierto
+2026-11-24T03:19:20.719+00:00,3,3_metricas_antes,http://acceso:5003,2.0,3,2,1,3,18.1,19.3,27.3,27.3,CERRADO,1,3,10.0,0,0,5,0,1,0,,,
+2026-11-24T03:19:24.143+00:00,3,3_metricas_despues,http://acceso:5003,2.0,15,7,1,13,795.9,56.7,2021.4,2021.4,ABIERTO,6,3,10.0,1,0,5,0,5,2,2,5,
+2026-11-24T03:19:25.003+00:00,3,3_metricas_finales,http://acceso:5003,2.0,16,7,1,13,795.9,56.7,2021.4,2021.4,ABIERTO,6,3,10.0,1,1,5,0,5,2,2,5,1

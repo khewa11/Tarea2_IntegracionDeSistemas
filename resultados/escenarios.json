@@ -1,0 +1,603 @@
+{
+  "inicio_utc": "2026-11-24T03:19:17.614+00:00",
+  "fin_utc": "2026-11-24T03:19:25.603+00:00",
+  "duracion_s": 7.989,
+  "seleccion": "todos",
+  "gateway": "http://127.0.0.1:8080",
+  "entorno": "Docker Compose",
+  "resultado": "OK",
+  "error": null,
+  "escenarios": {
+    "1": "APROBADO",
+    "2": "APROBADO",
+    "3": "APROBADO"
+  },
+  "eventos": [
+    {
+      "timestamp_utc": "2026-11-24T03:19:18.693+00:00",
+      "escenario": null,
+      "etapa": "falla",
+      "datos": {
+        "modo": "ok",
+        "delayMs": 0
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:18.730+00:00",
+      "escenario": "1",
+      "etapa": "inicio_escenario",
+      "datos": {}
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:18.963+00:00",
+      "escenario": "1",
+      "etapa": "1_exito",
+      "datos": {
+        "http": 201,
+        "ms": 185.0,
+        "sagaId": "S-0fd849fa67694623a611f8f366e99360",
+        "estado": "COMPLETADA",
+        "motivo": null
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:19.015+00:00",
+      "escenario": "1",
+      "etapa": "1_bff",
+      "datos": {
+        "sagaId": "S-0fd849fa67694623a611f8f366e99360",
+        "estadoGeneral": "COMPLETADA",
+        "motivo": null,
+        "espacio": {
+          "sagaId": "S-0fd849fa67694623a611f8f366e99360",
+          "espacioId": "E-002",
+          "estado": "RESERVADA",
+          "creadoEn": "2026-11-24T03:19:18.842+00:00",
+          "actualizadoEn": "2026-11-24T03:19:18.842+00:00"
+        },
+        "pago": {
+          "sagaId": "S-0fd849fa67694623a611f8f366e99360",
+          "monto": "4000",
+          "moneda": "CLP",
+          "estado": "COBRADO",
+          "referenciaPasarela": "SIM-S-0fd849fa67694623a611f8f366e99360",
+          "creadoEn": "2026-11-24T03:19:18.882+00:00",
+          "actualizadoEn": "2026-11-24T03:19:18.882+00:00"
+        },
+        "acceso": {
+          "sagaId": "S-0fd849fa67694623a611f8f366e99360",
+          "patente": "TEST12",
+          "espacioId": "E-002",
+          "estado": "HABILITADA",
+          "creadoEn": "2026-11-24T03:19:18.923+00:00",
+          "actualizadoEn": "2026-11-24T03:19:18.923+00:00"
+        },
+        "degradacionActiva": false
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:19.043+00:00",
+      "escenario": "1",
+      "etapa": "1_repeticion_idempotente",
+      "datos": {
+        "http": 201,
+        "ms": 27.5,
+        "sagaId": "S-0fd849fa67694623a611f8f366e99360",
+        "estado": "COMPLETADA",
+        "motivo": null
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:19.123+00:00",
+      "escenario": "1",
+      "etapa": "1_doble_reserva",
+      "datos": {
+        "http": 409,
+        "ms": 80.0,
+        "sagaId": "S-444bfb5f6cae480c9c0204c5383ef1c5",
+        "estado": "FALLIDA",
+        "motivo": "ESPACIO_OCUPADO"
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:19.123+00:00",
+      "escenario": "1",
+      "etapa": "fin_escenario",
+      "datos": {
+        "estado": "APROBADO"
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:19.123+00:00",
+      "escenario": "2",
+      "etapa": "inicio_escenario",
+      "datos": {}
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:19.764+00:00",
+      "escenario": "2",
+      "etapa": "falla",
+      "datos": {
+        "modo": "error",
+        "delayMs": 0
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:20.001+00:00",
+      "escenario": "2",
+      "etapa": "2_compensacion",
+      "datos": {
+        "http": 503,
+        "ms": 235.6,
+        "sagaId": "S-0c8f474ffa5d4264b7d6681cb5ad4581",
+        "estado": "COMPENSADA",
+        "motivo": "ACCESO_HTTP_5XX_502"
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:20.054+00:00",
+      "escenario": "2",
+      "etapa": "2_bff_degradado",
+      "datos": {
+        "sagaId": "S-0c8f474ffa5d4264b7d6681cb5ad4581",
+        "estadoGeneral": "COMPENSADA",
+        "motivo": "ACCESO_HTTP_5XX_502",
+        "espacio": {
+          "sagaId": "S-0c8f474ffa5d4264b7d6681cb5ad4581",
+          "espacioId": "E-003",
+          "estado": "LIBERADA",
+          "creadoEn": "2026-11-24T03:19:19.801+00:00",
+          "actualizadoEn": "2026-11-24T03:19:19.954+00:00"
+        },
+        "pago": {
+          "sagaId": "S-0c8f474ffa5d4264b7d6681cb5ad4581",
+          "monto": "4000",
+          "moneda": "CLP",
+          "estado": "REEMBOLSADO",
+          "referenciaPasarela": "SIM-S-0c8f474ffa5d4264b7d6681cb5ad4581",
+          "creadoEn": "2026-11-24T03:19:19.832+00:00",
+          "actualizadoEn": "2026-11-24T03:19:19.920+00:00"
+        },
+        "acceso": {
+          "estado": "no_disponible",
+          "motivo": "Controlador de barrera no disponible (HTTP 502)"
+        },
+        "degradacionActiva": true
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:20.627+00:00",
+      "escenario": "2",
+      "etapa": "falla",
+      "datos": {
+        "modo": "ok",
+        "delayMs": 0
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:20.665+00:00",
+      "escenario": "2",
+      "etapa": "2_bff_recuperado",
+      "datos": {
+        "sagaId": "S-0c8f474ffa5d4264b7d6681cb5ad4581",
+        "estadoGeneral": "COMPENSADA",
+        "motivo": "ACCESO_HTTP_5XX_502",
+        "espacio": {
+          "sagaId": "S-0c8f474ffa5d4264b7d6681cb5ad4581",
+          "espacioId": "E-003",
+          "estado": "LIBERADA",
+          "creadoEn": "2026-11-24T03:19:19.801+00:00",
+          "actualizadoEn": "2026-11-24T03:19:19.954+00:00"
+        },
+        "pago": {
+          "sagaId": "S-0c8f474ffa5d4264b7d6681cb5ad4581",
+          "monto": "4000",
+          "moneda": "CLP",
+          "estado": "REEMBOLSADO",
+          "referenciaPasarela": "SIM-S-0c8f474ffa5d4264b7d6681cb5ad4581",
+          "creadoEn": "2026-11-24T03:19:19.832+00:00",
+          "actualizadoEn": "2026-11-24T03:19:19.920+00:00"
+        },
+        "acceso": {
+          "sagaId": "S-0c8f474ffa5d4264b7d6681cb5ad4581",
+          "patente": null,
+          "espacioId": null,
+          "estado": "REVOCADA",
+          "creadoEn": "2026-11-24T03:19:19.885+00:00",
+          "actualizadoEn": "2026-11-24T03:19:19.885+00:00"
+        },
+        "degradacionActiva": false
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:20.682+00:00",
+      "escenario": "2",
+      "etapa": "2_transiciones",
+      "datos": [
+        {
+          "estado": "INICIADA",
+          "detalle": null,
+          "timestamp": "2026-11-24T03:19:19.787+00:00"
+        },
+        {
+          "estado": "ESPACIO_RESERVADO",
+          "detalle": "RESERVAR ok",
+          "timestamp": "2026-11-24T03:19:19.814+00:00"
+        },
+        {
+          "estado": "PAGO_COBRADO",
+          "detalle": "COBRAR ok",
+          "timestamp": "2026-11-24T03:19:19.846+00:00"
+        },
+        {
+          "estado": "COMPENSANDO",
+          "detalle": "compensando tras HABILITAR: ACCESO_HTTP_5XX_502",
+          "timestamp": "2026-11-24T03:19:19.867+00:00"
+        },
+        {
+          "estado": "COMPENSANDO",
+          "detalle": "REVOCAR ok (REVOCADA)",
+          "timestamp": "2026-11-24T03:19:19.900+00:00"
+        },
+        {
+          "estado": "COMPENSANDO",
+          "detalle": "REEMBOLSAR ok (REEMBOLSADO)",
+          "timestamp": "2026-11-24T03:19:19.934+00:00"
+        },
+        {
+          "estado": "COMPENSANDO",
+          "detalle": "LIBERAR ok (LIBERADA)",
+          "timestamp": "2026-11-24T03:19:19.968+00:00"
+        },
+        {
+          "estado": "COMPENSADA",
+          "detalle": "compensación completa",
+          "timestamp": "2026-11-24T03:19:19.982+00:00"
+        }
+      ]
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:20.682+00:00",
+      "escenario": "2",
+      "etapa": "fin_escenario",
+      "datos": {
+        "estado": "APROBADO"
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:20.682+00:00",
+      "escenario": "3",
+      "etapa": "inicio_escenario",
+      "datos": {}
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:20.719+00:00",
+      "escenario": "3",
+      "etapa": "3_metricas_antes",
+      "datos": {
+        "url": "http://acceso:5003",
+        "timeoutSegundos": 2.0,
+        "llamadas": 3,
+        "resultados": {
+          "ok": 2,
+          "http_5xx": 1
+        },
+        "latenciaMs": {
+          "muestras": 3,
+          "promedio": 18.1,
+          "p50": 19.3,
+          "p95": 27.3,
+          "max": 27.3
+        },
+        "circuitBreaker": {
+          "estado": "CERRADO",
+          "fallosConsecutivos": 1,
+          "umbralFallos": 3,
+          "esperaSegundos": 10.0,
+          "aperturas": 0,
+          "rechazos": 0
+        },
+        "bulkhead": {
+          "maximo": 5,
+          "enCurso": 0,
+          "pico": 1,
+          "rechazos": 0
+        }
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:21.408+00:00",
+      "escenario": "3",
+      "etapa": "falla",
+      "datos": {
+        "modo": "lento",
+        "delayMs": 3500
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:21.722+00:00",
+      "escenario": "3",
+      "etapa": "3_dashboard_durante_pico",
+      "datos": {
+        "espacios": 10
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:24.128+00:00",
+      "escenario": "3",
+      "etapa": "3_pico",
+      "datos": [
+        {
+          "http": 503,
+          "ms": 2444.2,
+          "sagaId": "S-14461766428c41ca9b1131eaf392f45b",
+          "estado": "COMPENSADA",
+          "motivo": "ACCESO_TIMEOUT"
+        },
+        {
+          "http": 503,
+          "ms": 2664.0,
+          "sagaId": "S-6381ce7657a3448eb82a3878daa14287",
+          "estado": "COMPENSADA",
+          "motivo": "ACCESO_TIMEOUT"
+        },
+        {
+          "http": 503,
+          "ms": 2709.2,
+          "sagaId": "S-5201e76670574ddc812f1250cbc30bd5",
+          "estado": "COMPENSADA",
+          "motivo": "ACCESO_TIMEOUT"
+        },
+        {
+          "http": 503,
+          "ms": 2575.6,
+          "sagaId": "S-be1ca21be5dc484bbf762d7d6ceea93b",
+          "estado": "COMPENSADA",
+          "motivo": "ACCESO_TIMEOUT"
+        },
+        {
+          "http": 503,
+          "ms": 684.0,
+          "sagaId": "S-c530ff3461f74754bb6c2fe0698d8070",
+          "estado": "COMPENSADA",
+          "motivo": "BULKHEAD_LLENO_ACCESO"
+        },
+        {
+          "http": 503,
+          "ms": 656.2,
+          "sagaId": "S-d1943ddad8224f58bbe21db15558a96e",
+          "estado": "COMPENSADA",
+          "motivo": "BULKHEAD_LLENO_ACCESO"
+        },
+        {
+          "http": 503,
+          "ms": 2676.8,
+          "sagaId": "S-2c56b5980ea94b2392aaa4c03ba1339d",
+          "estado": "COMPENSADA",
+          "motivo": "ACCESO_TIMEOUT"
+        }
+      ]
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:24.143+00:00",
+      "escenario": "3",
+      "etapa": "3_metricas_despues",
+      "datos": {
+        "url": "http://acceso:5003",
+        "timeoutSegundos": 2.0,
+        "llamadas": 15,
+        "resultados": {
+          "ok": 7,
+          "http_5xx": 1,
+          "bulkhead_lleno": 2,
+          "timeout": 5
+        },
+        "latenciaMs": {
+          "muestras": 13,
+          "promedio": 795.9,
+          "p50": 56.7,
+          "p95": 2021.4,
+          "max": 2021.4
+        },
+        "circuitBreaker": {
+          "estado": "ABIERTO",
+          "fallosConsecutivos": 6,
+          "umbralFallos": 3,
+          "esperaSegundos": 10.0,
+          "aperturas": 1,
+          "rechazos": 0
+        },
+        "bulkhead": {
+          "maximo": 5,
+          "enCurso": 0,
+          "pico": 5,
+          "rechazos": 2
+        }
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:24.873+00:00",
+      "escenario": "3",
+      "etapa": "falla",
+      "datos": {
+        "modo": "caido",
+        "delayMs": 0
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:24.939+00:00",
+      "escenario": "3",
+      "etapa": "3_fail_fast",
+      "datos": {
+        "http": 503,
+        "ms": 35.1,
+        "sagaId": "S-cd38cba7f83d4665b0a4004f13341af2",
+        "estado": "FALLIDA",
+        "motivo": "CIRCUITO_ABIERTO_ACCESO"
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:24.984+00:00",
+      "escenario": "3",
+      "etapa": "3_dashboard_despues",
+      "datos": {
+        "espacios": 10,
+        "metricasSistema": {
+          "servicio": "orquestador",
+          "uptimeSegundos": 62.8,
+          "sagas": {
+            "porEstado": {
+              "COMPENSADA": 16,
+              "COMPLETADA": 2,
+              "FALLIDA": 4
+            },
+            "enCurso": 0
+          },
+          "dependencias": {
+            "espacios": {
+              "url": "http://espacios:5001",
+              "timeoutSegundos": 2.0,
+              "llamadas": 18,
+              "resultados": {
+                "ok": 17,
+                "rechazo_4xx": 1
+              },
+              "latenciaMs": {
+                "muestras": 18,
+                "promedio": 83.9,
+                "p50": 56.5,
+                "p95": 222.1,
+                "max": 222.1
+              },
+              "circuitBreaker": {
+                "estado": "CERRADO",
+                "fallosConsecutivos": 0,
+                "umbralFallos": 3,
+                "esperaSegundos": 10.0,
+                "aperturas": 0,
+                "rechazos": 0
+              }
+            },
+            "pagos": {
+              "url": "http://pagos:5002",
+              "timeoutSegundos": 2.0,
+              "llamadas": 17,
+              "resultados": {
+                "ok": 17
+              },
+              "latenciaMs": {
+                "muestras": 17,
+                "promedio": 72.1,
+                "p50": 50.9,
+                "p95": 164.6,
+                "max": 164.6
+              },
+              "circuitBreaker": {
+                "estado": "CERRADO",
+                "fallosConsecutivos": 0,
+                "umbralFallos": 3,
+                "esperaSegundos": 10.0,
+                "aperturas": 0,
+                "rechazos": 0
+              }
+            },
+            "acceso": {
+              "url": "http://acceso:5003",
+              "timeoutSegundos": 2.0,
+              "llamadas": 16,
+              "resultados": {
+                "ok": 7,
+                "http_5xx": 1,
+                "bulkhead_lleno": 2,
+                "timeout": 5,
+                "circuito_abierto": 1
+              },
+              "latenciaMs": {
+                "muestras": 13,
+                "promedio": 795.9,
+                "p50": 56.7,
+                "p95": 2021.4,
+                "max": 2021.4
+              },
+              "circuitBreaker": {
+                "estado": "ABIERTO",
+                "fallosConsecutivos": 6,
+                "umbralFallos": 3,
+                "esperaSegundos": 10.0,
+                "aperturas": 1,
+                "rechazos": 1
+              },
+              "bulkhead": {
+                "maximo": 5,
+                "enCurso": 0,
+                "pico": 5,
+                "rechazos": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:25.003+00:00",
+      "escenario": "3",
+      "etapa": "3_metricas_finales",
+      "datos": {
+        "url": "http://acceso:5003",
+        "timeoutSegundos": 2.0,
+        "llamadas": 16,
+        "resultados": {
+          "ok": 7,
+          "http_5xx": 1,
+          "bulkhead_lleno": 2,
+          "timeout": 5,
+          "circuito_abierto": 1
+        },
+        "latenciaMs": {
+          "muestras": 13,
+          "promedio": 795.9,
+          "p50": 56.7,
+          "p95": 2021.4,
+          "max": 2021.4
+        },
+        "circuitBreaker": {
+          "estado": "ABIERTO",
+          "fallosConsecutivos": 6,
+          "umbralFallos": 3,
+          "esperaSegundos": 10.0,
+          "aperturas": 1,
+          "rechazos": 1
+        },
+        "bulkhead": {
+          "maximo": 5,
+          "enCurso": 0,
+          "pico": 5,
+          "rechazos": 2
+        }
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:25.003+00:00",
+      "escenario": "3",
+      "etapa": "fin_escenario",
+      "datos": {
+        "estado": "APROBADO"
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:25.602+00:00",
+      "escenario": null,
+      "etapa": "falla",
+      "datos": {
+        "modo": "ok",
+        "delayMs": 0
+      }
+    },
+    {
+      "timestamp_utc": "2026-11-24T03:19:25.603+00:00",
+      "escenario": null,
+      "etapa": "resultado",
+      "datos": "OK"
+    }
+  ]
+}

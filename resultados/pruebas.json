@@ -1,0 +1,983 @@
+{
+  "inicio_utc": "2026-11-24T02:58:56.695+00:00",
+  "fin_utc": "2026-11-24T02:59:06.981+00:00",
+  "duracion_s": 10.286,
+  "python": "3.12.10",
+  "dependencias": {
+    "pytest": "8.3.5",
+    "fastapi": "0.115.12",
+    "pydantic": "2.11.4",
+    "httpx": "0.28.1",
+    "PyJWT": "2.9.0",
+    "PyYAML": "6.0.2"
+  },
+  "codigo_salida": 0,
+  "total": 40,
+  "resumen": {
+    "APROBADA": 40
+  },
+  "errores_coleccion": [],
+  "pruebas": [
+    {
+      "prueba": "bff/tests/test_bff.py::test_bff_health",
+      "archivo": "bff/tests/test_bff.py",
+      "estado": "APROBADA",
+      "duracion_ms": 7.132,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000991
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.005812
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000329
+        }
+      ]
+    },
+    {
+      "prueba": "bff/tests/test_bff.py::test_mi_reserva_completa_sin_degradacion",
+      "archivo": "bff/tests/test_bff.py",
+      "estado": "APROBADA",
+      "duracion_ms": 412.56,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000194
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.412164
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000202
+        }
+      ]
+    },
+    {
+      "prueba": "bff/tests/test_bff.py::test_mi_reserva_degradacion_elegante_cuando_acceso_falla",
+      "archivo": "bff/tests/test_bff.py",
+      "estado": "APROBADA",
+      "duracion_ms": 274.919,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000169
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.274395
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000355
+        }
+      ]
+    },
+    {
+      "prueba": "bff/tests/test_bff.py::test_dashboard_agregado",
+      "archivo": "bff/tests/test_bff.py",
+      "estado": "APROBADA",
+      "duracion_ms": 261.524,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000364
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.260999
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000161
+        }
+      ]
+    },
+    {
+      "prueba": "gateway/tests/test_gateway.py::test_health_publico",
+      "archivo": "gateway/tests/test_gateway.py",
+      "estado": "APROBADA",
+      "duracion_ms": 4.139,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.00075
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.003188
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000201
+        }
+      ]
+    },
+    {
+      "prueba": "gateway/tests/test_gateway.py::test_rechaza_sin_token",
+      "archivo": "gateway/tests/test_gateway.py",
+      "estado": "APROBADA",
+      "duracion_ms": 3.756,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000234
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.003203
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000319
+        }
+      ]
+    },
+    {
+      "prueba": "gateway/tests/test_gateway.py::test_rechaza_token_invalido",
+      "archivo": "gateway/tests/test_gateway.py",
+      "estado": "APROBADA",
+      "duracion_ms": 4.37,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000414
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.003783
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000173
+        }
+      ]
+    },
+    {
+      "prueba": "gateway/tests/test_gateway.py::test_bloquea_ruta_admin_con_403",
+      "archivo": "gateway/tests/test_gateway.py",
+      "estado": "APROBADA",
+      "duracion_ms": 25.69,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.00021
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.024935
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000545
+        }
+      ]
+    },
+    {
+      "prueba": "gateway/tests/test_gateway.py::test_rate_limiting_por_cliente",
+      "archivo": "gateway/tests/test_gateway.py",
+      "estado": "APROBADA",
+      "duracion_ms": 20.685,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000428
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.019908
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000349
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_camino_feliz",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 105.468,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.007827
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.097384
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000257
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_espacio_ocupado_falla_sin_compensar",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 99.981,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.002183
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.09755
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000248
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_falla_acceso_compensa_en_orden_inverso[error]",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 132.972,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.002991
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.12976
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000221
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_falla_acceso_compensa_en_orden_inverso[caido]",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 139.683,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.002053
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.137395
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000235
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_acceso_lento_dispara_timeout_y_compensa",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 1045.513,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.001917
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 1.043112
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000484
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_falla_en_pagos_solo_libera_espacio",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 225.217,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.00197
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.223037
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.00021
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_circuit_breaker_abre_falla_rapido_y_se_recupera",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 456.543,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.001712
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.454597
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000234
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_semi_abierto_que_falla_vuelve_a_abrir",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 225.913,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.003094
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.222523
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000296
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_bulkhead_limita_llamadas_concurrentes_a_acceso",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 563.457,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.002283
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.560676
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000498
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_saga_id_repetido_es_idempotente",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 89.322,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.004244
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.084858
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.00022
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_recuperacion_tras_caida_del_orquestador",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 112.313,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.001827
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.110263
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000223
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_servicio_inalcanzable_cuenta_como_fallo",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 130.975,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.001737
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.129011
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000227
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_validacion_y_404",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 41.48,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.003146
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.037947
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000387
+        }
+      ]
+    },
+    {
+      "prueba": "orquestador/tests/test_saga.py::test_metrics_expone_latencias_y_conteos",
+      "archivo": "orquestador/tests/test_saga.py",
+      "estado": "APROBADA",
+      "duracion_ms": 109.645,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.003577
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.105854
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000214
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_acceso.py::test_habilitar_y_revocar_idempotentes",
+      "archivo": "tests/test_acceso.py",
+      "estado": "APROBADA",
+      "duracion_ms": 161.867,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.081808
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.076276
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.003783
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_acceso.py::test_modos_falla_y_reactivacion",
+      "archivo": "tests/test_acceso.py",
+      "estado": "APROBADA",
+      "duracion_ms": 189.271,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.093239
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.09232
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.003712
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_acceso.py::test_lentitud_es_real_y_revocar_evitar_habilitacion_tardia",
+      "archivo": "tests/test_acceso.py",
+      "estado": "APROBADA",
+      "duracion_ms": 424.253,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.099956
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.319599
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.004698
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_acceso.py::test_compensar_antes_de_habilitar",
+      "archivo": "tests/test_acceso.py",
+      "estado": "APROBADA",
+      "duracion_ms": 170.338,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.115097
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.048505
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.006736
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_espacios.py::test_espacio_no_se_reserva_dos_veces_y_se_libera",
+      "archivo": "tests/test_espacios.py",
+      "estado": "APROBADA",
+      "duracion_ms": 233.928,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.117563
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.110316
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.006049
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_espacios.py::test_reserva_identificador_no_se_reutiliza_con_otros_parametros",
+      "archivo": "tests/test_espacios.py",
+      "estado": "APROBADA",
+      "duracion_ms": 140.352,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.097327
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.038083
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.004942
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_espacios.py::test_una_sola_reserva_en_competencia",
+      "archivo": "tests/test_espacios.py",
+      "estado": "APROBADA",
+      "duracion_ms": 229.94,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.11045
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.110343
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.009147
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_espacios.py::test_tombstone_evitar_reserva_que_llega_tarde",
+      "archivo": "tests/test_espacios.py",
+      "estado": "APROBADA",
+      "duracion_ms": 192.101,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.125887
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.057498
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.008716
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_pagos.py::test_cobro_reembolso_exactamente_una_vez",
+      "archivo": "tests/test_pagos.py",
+      "estado": "APROBADA",
+      "duracion_ms": 143.798,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.091488
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.047993
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.004317
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_pagos.py::test_adelantar_reembolso_impide_cobro_tardio",
+      "archivo": "tests/test_pagos.py",
+      "estado": "APROBADA",
+      "duracion_ms": 164.815,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.109854
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.045774
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.009187
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_pagos.py::test_validacion_montos",
+      "archivo": "tests/test_pagos.py",
+      "estado": "APROBADA",
+      "duracion_ms": 135.294,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.120908
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.008214
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.006172
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_pagos.py::test_persistencia_tras_reinicio",
+      "archivo": "tests/test_pagos.py",
+      "estado": "APROBADA",
+      "duracion_ms": 116.469,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.002859
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.113155
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000455
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_paso0.py::test_compose_seis_servicios_y_solo_gateway_publico",
+      "archivo": "tests/test_paso0.py",
+      "estado": "APROBADA",
+      "duracion_ms": 21.589,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000426
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.020719
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000444
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_paso0.py::test_carpeta_y_contrato_paso0",
+      "archivo": "tests/test_paso0.py",
+      "estado": "APROBADA",
+      "duracion_ms": 39.916,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.000653
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.038876
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000387
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_paso0.py::test_stub_responde_salud_y_501_sin_fingir_gateway_funcional",
+      "archivo": "tests/test_paso0.py",
+      "estado": "APROBADA",
+      "duracion_ms": 350.332,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.00034
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.3496
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.000392
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_saga_manual.py::test_camino_feliz_sin_orquestador",
+      "archivo": "tests/test_saga_manual.py",
+      "estado": "APROBADA",
+      "duracion_ms": 232.035,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.129644
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.09685
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.005541
+        }
+      ]
+    },
+    {
+      "prueba": "tests/test_saga_manual.py::test_falla_ultimo_paso_se_compensa_inversamente",
+      "archivo": "tests/test_saga_manual.py",
+      "estado": "APROBADA",
+      "duracion_ms": 288.305,
+      "detalle": "",
+      "fases": [
+        {
+          "fase": "setup",
+          "resultado": "passed",
+          "duracion_s": 0.106665
+        },
+        {
+          "fase": "call",
+          "resultado": "passed",
+          "duracion_s": 0.171177
+        },
+        {
+          "fase": "teardown",
+          "resultado": "passed",
+          "duracion_s": 0.010463
+        }
+      ]
+    }
+  ],
+  "salida_pytest": "........................................                                                             [100%]\n============================================ warnings summary =============================================\n.venv\\Lib\\site-packages\\starlette\\testclient.py:37\n  C:\\Users\\gznov\\Desktop\\Tarea2_IntegracionDeSistemas\\.venv\\Lib\\site-packages\\starlette\\testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n40 passed, 1 warning in 8.65s\n"
+}
