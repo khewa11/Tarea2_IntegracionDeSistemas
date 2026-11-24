@@ -129,6 +129,15 @@ class PasarelaWebpay(Pasarela):
                                      IntegrationType.TEST, timeout=timeout_s)
             transaccion = Transaction(opciones)
         self._tx = transaccion
+        # Valores que jamás deben salir en respuestas ni logs (p. ej. si el proveedor los
+        # repite en un mensaje de error).
+        opciones_tx = getattr(transaccion, "options", None)
+        self._secretos = [v for v in (api_key, getattr(opciones_tx, "api_key", None)) if v]
+
+    def _sanear(self, texto: str) -> str:
+        for secreto in self._secretos:
+            texto = texto.replace(secreto, "***")
+        return texto[:200]
 
     def _llamar(self, operacion: str, funcion, *args):
         try:
@@ -138,7 +147,7 @@ class PasarelaWebpay(Pasarela):
             if "Timeout" in nombre:
                 raise ErrorPasarela(operacion, "timeout hacia Webpay", 504) from None
             if hasattr(exc, "message") and hasattr(exc, "code"):  # TransbankError y derivados
-                raise ErrorPasarela(operacion, str(exc.message)[:200], getattr(exc, "code", None) or 502) from None
+                raise ErrorPasarela(operacion, self._sanear(str(exc.message)), getattr(exc, "code", None) or 502) from None
             raise ErrorPasarela(operacion, f"error de comunicación con Webpay ({nombre})", 502) from None
 
     def iniciar(self, saga_id: str, monto_centavos: int) -> Inicio:
