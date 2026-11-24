@@ -74,3 +74,38 @@ def test_dashboard_agregado():
     assert len(data["espacios"]) == 1
     assert data["espacios"][0]["espacioId"] == "E-001"
     assert data["metricasSistema"]["totalSagas"] == 5
+
+def test_mi_reserva_pago_pendiente_expone_url_y_mantiene_degradacion():
+    async def fake_consultar(client_http, url, timeout_s=2.0):
+        if "/reservas-estacionamiento/" in url:
+            return 200, {"sagaId": "S-300", "estado": "PAGO_PENDIENTE", "motivo": None,
+                         "pago": {"token": "tok-300", "url": "https://webpay3gint.transbank.cl/x",
+                                  "buyOrder": "S-300", "limite": 1.0}}
+        if "/reservas/" in url:
+            return 200, {"sagaId": "S-300", "espacioId": "E-003", "estado": "RESERVADA"}
+        if "/cobros/" in url:
+            return 200, {"sagaId": "S-300", "monto": "4000", "estado": "PENDIENTE"}
+        if "/habilitaciones/" in url:
+            return 503, {"error": "CONNECTION_ERROR"}
+        return 404, {}
+
+    with patch("bff.main.consultar_servicio", side_effect=AsyncMock(side_effect=fake_consultar)):
+        resp = client.get("/bff/mi-reserva/S-300")
+
+    data = resp.json()
+    assert resp.status_code == 200
+    assert data["estadoGeneral"] == "PAGO_PENDIENTE"
+    assert data["pago"]["estado"] == "PENDIENTE"
+    assert data["pagoPendiente"] == {"url": "https://webpay3gint.transbank.cl/x", "token": "tok-300"}
+    assert data["degradacionActiva"] is True and data["acceso"]["estado"] == "no_disponible"
+
+
+def test_mi_reserva_completada_no_incluye_pago_pendiente():
+    async def fake_consultar(client_http, url, timeout_s=2.0):
+        if "/reservas-estacionamiento/" in url:
+            return 200, {"sagaId": "S-400", "estado": "COMPLETADA", "motivo": None}
+        return 200, {"estado": "OK"}
+
+    with patch("bff.main.consultar_servicio", side_effect=AsyncMock(side_effect=fake_consultar)):
+        data = client.get("/bff/mi-reserva/S-400").json()
+    assert "pagoPendiente" not in data

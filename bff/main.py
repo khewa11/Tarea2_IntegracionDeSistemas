@@ -118,6 +118,11 @@ async def obtener_mi_reserva(saga_id: str):
         "acceso": bloque_acceso,
         "degradacionActiva": degradado,
     }
+    # Pasarela asíncrona (Webpay): mientras el usuario no paga, se expone la URL de pago
+    # para retomar el pago desde la web. En modo simulado este bloque no aparece.
+    pago_orq = data_orq.get("pago") if status_orq == 200 else None
+    if respuesta["estadoGeneral"] == "PAGO_PENDIENTE" and pago_orq:
+        respuesta["pagoPendiente"] = {"url": pago_orq.get("url"), "token": pago_orq.get("token")}
 
     duracion = (time.perf_counter() - inicio) * 1000
     log_json(
