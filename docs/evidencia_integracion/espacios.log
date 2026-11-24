@@ -1,0 +1,54 @@
+INFO:     Started server process [995]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:5001 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50392 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50400 - "GET /espacios HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.140+00:00","sagaId":"S-a9b953a80a8e4457a1632716af4fd9d6","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas HTTP/1.1" 201 Created
+INFO:     127.0.0.1:50420 - "GET /reservas/S-a9b953a80a8e4457a1632716af4fd9d6 HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.231+00:00","sagaId":"S-c08f14e48f11412492f7ff232132e126","servicio":"espacios","paso":"reservar","resultado":"FALLO","codigo":409,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:50422 - "GET /espacios HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.295+00:00","sagaId":"S-495c81015c0c400b9db090e9033ce44a","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas HTTP/1.1" 201 Created
+{"timestamp":"2026-11-24T01:59:06.335+00:00","sagaId":"S-495c81015c0c400b9db090e9033ce44a","servicio":"espacios","paso":"liberar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas/S-495c81015c0c400b9db090e9033ce44a/liberar HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50430 - "GET /reservas/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50444 - "GET /reservas/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50446 - "GET /espacios HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.599+00:00","sagaId":"S-82a19fe916724b879480e4e2edb2918b","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas HTTP/1.1" 201 Created
+{"timestamp":"2026-11-24T01:59:06.615+00:00","sagaId":"S-c0488c4b358b4be6a148a1800e9a7ca5","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50462 - "POST /reservas HTTP/1.1" 201 Created
+{"timestamp":"2026-11-24T01:59:06.618+00:00","sagaId":"S-cc4f2eb826234354a1aa034cc2db2049","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50472 - "POST /reservas HTTP/1.1" 201 Created
+{"timestamp":"2026-11-24T01:59:06.621+00:00","sagaId":"S-d5dcdf2ef59b434484bd8d7c7986b517","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50490 - "POST /reservas HTTP/1.1" 201 Created
+{"timestamp":"2026-11-24T01:59:06.631+00:00","sagaId":"S-ec5dc888cf6f4ac4a55d660e4d7f20b3","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50478 - "POST /reservas HTTP/1.1" 201 Created
+{"timestamp":"2026-11-24T01:59:06.647+00:00","sagaId":"S-200e0de879f54146b325b31048c5ea77","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50486 - "POST /reservas HTTP/1.1" 201 Created
+{"timestamp":"2026-11-24T01:59:06.668+00:00","sagaId":"S-46d48d5584b040449c02a30e857b3f25","servicio":"espacios","paso":"reservar","resultado":"OK","codigo":201,"idempotente":false}
+INFO:     127.0.0.1:50498 - "POST /reservas HTTP/1.1" 201 Created
+{"timestamp":"2026-11-24T01:59:06.711+00:00","sagaId":"S-d5dcdf2ef59b434484bd8d7c7986b517","servicio":"espacios","paso":"liberar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas/S-d5dcdf2ef59b434484bd8d7c7986b517/liberar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:06.727+00:00","sagaId":"S-46d48d5584b040449c02a30e857b3f25","servicio":"espacios","paso":"liberar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:50462 - "POST /reservas/S-46d48d5584b040449c02a30e857b3f25/liberar HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50508 - "GET /espacios HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.646+00:00","sagaId":"S-82a19fe916724b879480e4e2edb2918b","servicio":"espacios","paso":"liberar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas/S-82a19fe916724b879480e4e2edb2918b/liberar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.690+00:00","sagaId":"S-c0488c4b358b4be6a148a1800e9a7ca5","servicio":"espacios","paso":"liberar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas/S-c0488c4b358b4be6a148a1800e9a7ca5/liberar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.726+00:00","sagaId":"S-cc4f2eb826234354a1aa034cc2db2049","servicio":"espacios","paso":"liberar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:50462 - "POST /reservas/S-cc4f2eb826234354a1aa034cc2db2049/liberar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.728+00:00","sagaId":"S-ec5dc888cf6f4ac4a55d660e4d7f20b3","servicio":"espacios","paso":"liberar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:50414 - "POST /reservas/S-ec5dc888cf6f4ac4a55d660e4d7f20b3/liberar HTTP/1.1" 200 OK
+{"timestamp":"2026-11-24T01:59:08.749+00:00","sagaId":"S-200e0de879f54146b325b31048c5ea77","servicio":"espacios","paso":"liberar","resultado":"OK","codigo":200,"idempotente":false}
+INFO:     127.0.0.1:50462 - "POST /reservas/S-200e0de879f54146b325b31048c5ea77/liberar HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50516 - "GET /espacios HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50526 - "GET /espacios HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [995]

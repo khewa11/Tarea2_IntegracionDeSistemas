@@ -1,0 +1,27 @@
+INFO:     Started server process [999]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:3000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:44334 - "GET /health HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.107876+00:00", "sagaId": null, "servicio": "bff", "paso": "BFF_DASHBOARD", "resultado": "OK", "codigo": 200, "duracionMs": 60.6}
+INFO:     127.0.0.1:44346 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.196034+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "bff", "paso": "BFF_MI_RESERVA", "resultado": "OK", "codigo": 200, "duracionMs": 15.9, "modo": "normal"}
+INFO:     127.0.0.1:44362 - "GET /bff/mi-reserva/S-a9b953a80a8e4457a1632716af4fd9d6 HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.262469+00:00", "sagaId": null, "servicio": "bff", "paso": "BFF_DASHBOARD", "resultado": "OK", "codigo": 200, "duracionMs": 12.83}
+INFO:     127.0.0.1:44364 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.368182+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "bff", "paso": "BFF_MI_RESERVA", "resultado": "OK_DEGRADADO", "codigo": 200, "duracionMs": 15.45, "modo": "degradado"}
+INFO:     127.0.0.1:44370 - "GET /bff/mi-reserva/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.416233+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "bff", "paso": "BFF_MI_RESERVA", "resultado": "OK", "codigo": 200, "duracionMs": 19.56, "modo": "normal"}
+INFO:     127.0.0.1:44380 - "GET /bff/mi-reserva/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.450419+00:00", "sagaId": null, "servicio": "bff", "paso": "BFF_DASHBOARD", "resultado": "OK", "codigo": 200, "duracionMs": 11.99}
+INFO:     127.0.0.1:44390 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.739948+00:00", "sagaId": null, "servicio": "bff", "paso": "BFF_DASHBOARD", "resultado": "OK", "codigo": 200, "duracionMs": 28.95}
+INFO:     127.0.0.1:44396 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:08.817700+00:00", "sagaId": null, "servicio": "bff", "paso": "BFF_DASHBOARD", "resultado": "OK", "codigo": 200, "duracionMs": 17.11}
+INFO:     127.0.0.1:44402 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:08.860533+00:00", "sagaId": null, "servicio": "bff", "paso": "BFF_DASHBOARD", "resultado": "OK", "codigo": 200, "duracionMs": 12.67}
+INFO:     127.0.0.1:44414 - "GET /bff/dashboard HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [999]

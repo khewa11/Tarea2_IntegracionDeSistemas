@@ -1,0 +1,68 @@
+INFO:     Started server process [1000]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:18080 (Press CTRL+C to quit)
+INFO:     127.0.0.1:42534 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42550 - "GET /health HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:05.958885+00:00", "sagaId": null, "servicio": "gateway", "paso": "VALIDAR_JWT", "resultado": "DENEGADO", "codigo": 401, "duracionMs": 0.02}
+INFO:     127.0.0.1:42550 - "GET /metrics HTTP/1.1" 401 Unauthorized
+{"timestamp": "2026-11-24T01:59:05.961362+00:00", "sagaId": null, "servicio": "gateway", "paso": "EMITIR_TOKEN", "resultado": "OK", "codigo": 200, "detalle": "cliente=demo-804865bea4ed43d3bb172d128d1a0c7b"}
+INFO:     127.0.0.1:42550 - "POST /auth/token HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:05.962477+00:00", "sagaId": null, "servicio": "gateway", "paso": "BLOQUEO_ADMIN", "resultado": "RECHAZADO", "codigo": 403, "duracionMs": 0.0}
+INFO:     127.0.0.1:42550 - "POST /admin/falla HTTP/1.1" 403 Forbidden
+{"timestamp": "2026-11-24T01:59:06.035970+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/metrics", "resultado": "OK", "codigo": 200, "duracionMs": 58.65}
+INFO:     127.0.0.1:42550 - "GET /metrics HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.110199+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/bff/dashboard", "resultado": "OK", "codigo": 200, "duracionMs": 72.96}
+INFO:     127.0.0.1:42550 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.168723+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "OK", "codigo": 201, "duracionMs": 57.34}
+INFO:     127.0.0.1:42550 - "POST /reservas-estacionamiento HTTP/1.1" 201 Created
+{"timestamp": "2026-11-24T01:59:06.197179+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "gateway", "paso": "PROXY_GET_/bff/mi-reserva/S-a9b953a80a8e4457a1632716af4fd9d6", "resultado": "OK", "codigo": 200, "duracionMs": 27.11}
+INFO:     127.0.0.1:42550 - "GET /bff/mi-reserva/S-a9b953a80a8e4457a1632716af4fd9d6 HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.211693+00:00", "sagaId": "S-a9b953a80a8e4457a1632716af4fd9d6", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "OK", "codigo": 201, "duracionMs": 13.27}
+INFO:     127.0.0.1:42550 - "POST /reservas-estacionamiento HTTP/1.1" 201 Created
+{"timestamp": "2026-11-24T01:59:06.237345+00:00", "sagaId": "S-c08f14e48f11412492f7ff232132e126", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 409, "duracionMs": 24.45}
+INFO:     127.0.0.1:42550 - "POST /reservas-estacionamiento HTTP/1.1" 409 Conflict
+{"timestamp": "2026-11-24T01:59:06.263819+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/bff/dashboard", "resultado": "OK", "codigo": 200, "duracionMs": 25.29}
+INFO:     127.0.0.1:42550 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.342289+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 63.9}
+INFO:     127.0.0.1:42550 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:06.369736+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "gateway", "paso": "PROXY_GET_/bff/mi-reserva/S-495c81015c0c400b9db090e9033ce44a", "resultado": "OK", "codigo": 200, "duracionMs": 26.37}
+INFO:     127.0.0.1:42550 - "GET /bff/mi-reserva/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.417280+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "gateway", "paso": "PROXY_GET_/bff/mi-reserva/S-495c81015c0c400b9db090e9033ce44a", "resultado": "OK", "codigo": 200, "duracionMs": 31.64}
+INFO:     127.0.0.1:42550 - "GET /bff/mi-reserva/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.428556+00:00", "sagaId": "S-495c81015c0c400b9db090e9033ce44a", "servicio": "gateway", "paso": "PROXY_GET_/reservas-estacionamiento/S-495c81015c0c400b9db090e9033ce44a", "resultado": "OK", "codigo": 200, "duracionMs": 10.09}
+INFO:     127.0.0.1:42550 - "GET /reservas-estacionamiento/S-495c81015c0c400b9db090e9033ce44a HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.451577+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/bff/dashboard", "resultado": "OK", "codigo": 200, "duracionMs": 21.82}
+INFO:     127.0.0.1:42550 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.464485+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/metrics", "resultado": "OK", "codigo": 200, "duracionMs": 11.88}
+INFO:     127.0.0.1:42550 - "GET /metrics HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:06.724315+00:00", "sagaId": "S-d5dcdf2ef59b434484bd8d7c7986b517", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 174.43}
+INFO:     127.0.0.1:42594 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:06.738806+00:00", "sagaId": "S-46d48d5584b040449c02a30e857b3f25", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 180.35}
+INFO:     127.0.0.1:42610 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:06.741133+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/bff/dashboard", "resultado": "OK", "codigo": 200, "duracionMs": 47.92}
+INFO:     127.0.0.1:42622 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:08.654512+00:00", "sagaId": "S-82a19fe916724b879480e4e2edb2918b", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 2172.01}
+INFO:     127.0.0.1:42550 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.705910+00:00", "sagaId": "S-c0488c4b358b4be6a148a1800e9a7ca5", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 2194.12}
+INFO:     127.0.0.1:42564 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.736677+00:00", "sagaId": "S-cc4f2eb826234354a1aa034cc2db2049", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 2214.92}
+INFO:     127.0.0.1:42574 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.747157+00:00", "sagaId": "S-ec5dc888cf6f4ac4a55d660e4d7f20b3", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 2215.95}
+INFO:     127.0.0.1:42578 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.757576+00:00", "sagaId": "S-200e0de879f54146b325b31048c5ea77", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 2217.24}
+INFO:     127.0.0.1:42582 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.773501+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/metrics", "resultado": "OK", "codigo": 200, "duracionMs": 13.32}
+INFO:     127.0.0.1:42550 - "GET /metrics HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:08.819268+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/bff/dashboard", "resultado": "OK", "codigo": 200, "duracionMs": 32.5}
+INFO:     127.0.0.1:42550 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:08.834340+00:00", "sagaId": "S-209c9172d3d74b6581fd5d77ee28ade4", "servicio": "gateway", "paso": "PROXY_POST_/reservas-estacionamiento", "resultado": "ERROR_UPSTREAM", "codigo": 503, "duracionMs": 13.5}
+INFO:     127.0.0.1:42550 - "POST /reservas-estacionamiento HTTP/1.1" 503 Service Unavailable
+{"timestamp": "2026-11-24T01:59:08.861756+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/bff/dashboard", "resultado": "OK", "codigo": 200, "duracionMs": 26.27}
+INFO:     127.0.0.1:42550 - "GET /bff/dashboard HTTP/1.1" 200 OK
+{"timestamp": "2026-11-24T01:59:08.874333+00:00", "sagaId": null, "servicio": "gateway", "paso": "PROXY_GET_/metrics", "resultado": "OK", "codigo": 200, "duracionMs": 11.44}
+INFO:     127.0.0.1:42550 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1000]

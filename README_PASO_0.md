@@ -1,3 +1,5 @@
+> Referencia histórica del Paso 0. Para el sistema integrado, usar [README.md](README.md).
+
 # Paso 0 — Contrato común y repositorio inicial
 
 Este entregable corresponde al **Paso 0** del documento «Separación de responsabilidades — Forma C». 
