@@ -1,0 +1,8 @@
+# SOLO para Postman/desarrollo local. No utilizar en el docker-compose.yml final.
+services:
+  espacios:
+    ports: ['127.0.0.1:5001:5001']
+  pagos:
+    ports: ['127.0.0.1:5002:5002']
+  acceso:
+    ports: ['127.0.0.1:5003:5003']

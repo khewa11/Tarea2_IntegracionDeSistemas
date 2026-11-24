@@ -1,0 +1,403 @@
+{
+  "info": {
+    "name": "Integración de Sistemas — Persona A (Forma C)",
+    "_postman_id": "00000000-0000-4000-8000-000000000001",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Pruebas locales de Espacios, Pagos y Acceso. Cambia sagaId para cada nuevo escenario."
+  },
+  "item": [
+    {
+      "name": "Espacios",
+      "item": [
+        {
+          "name": "GET espacios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{espaciosUrl}}/espacios",
+              "host": [
+                "{{espaciosUrl}}"
+              ],
+              "path": [
+                "espacios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST reservar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{espaciosUrl}}/reservas",
+              "host": [
+                "{{espaciosUrl}}"
+              ],
+              "path": [
+                "reservas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sagaId\": \"{{sagaId}}\",\n  \"espacioId\": \"{{espacioId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET reserva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{espaciosUrl}}/reservas/{{sagaId}}",
+              "host": [
+                "{{espaciosUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "{{sagaId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST liberar",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{espaciosUrl}}/reservas/{{sagaId}}/liberar",
+              "host": [
+                "{{espaciosUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "{{sagaId}}",
+                "liberar"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pagos",
+      "item": [
+        {
+          "name": "POST cobrar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{pagosUrl}}/cobros",
+              "host": [
+                "{{pagosUrl}}"
+              ],
+              "path": [
+                "cobros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sagaId\": \"{{sagaId}}\",\n  \"monto\": 4000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET cobro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pagosUrl}}/cobros/{{sagaId}}",
+              "host": [
+                "{{pagosUrl}}"
+              ],
+              "path": [
+                "cobros",
+                "{{sagaId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST reembolsar",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{pagosUrl}}/cobros/{{sagaId}}/reembolso",
+              "host": [
+                "{{pagosUrl}}"
+              ],
+              "path": [
+                "cobros",
+                "{{sagaId}}",
+                "reembolso"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Acceso",
+      "item": [
+        {
+          "name": "POST habilitar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accesoUrl}}/habilitaciones",
+              "host": [
+                "{{accesoUrl}}"
+              ],
+              "path": [
+                "habilitaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sagaId\": \"{{sagaId}}\",\n  \"patente\": \"{{patente}}\",\n  \"espacioId\": \"{{espacioId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET habilitacion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{accesoUrl}}/habilitaciones/{{sagaId}}",
+              "host": [
+                "{{accesoUrl}}"
+              ],
+              "path": [
+                "habilitaciones",
+                "{{sagaId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST revocar",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{accesoUrl}}/habilitaciones/{{sagaId}}/revocar",
+              "host": [
+                "{{accesoUrl}}"
+              ],
+              "path": [
+                "habilitaciones",
+                "{{sagaId}}",
+                "revocar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST modo lento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accesoUrl}}/admin/falla",
+              "host": [
+                "{{accesoUrl}}"
+              ],
+              "path": [
+                "admin",
+                "falla"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modo\": \"lento\",\n  \"delayMs\": 2500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST modo caido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accesoUrl}}/admin/falla",
+              "host": [
+                "{{accesoUrl}}"
+              ],
+              "path": [
+                "admin",
+                "falla"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modo\": \"caido\",\n  \"delayMs\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST modo error",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accesoUrl}}/admin/falla",
+              "host": [
+                "{{accesoUrl}}"
+              ],
+              "path": [
+                "admin",
+                "falla"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modo\": \"error\",\n  \"delayMs\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST restaurar ok",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accesoUrl}}/admin/falla",
+              "host": [
+                "{{accesoUrl}}"
+              ],
+              "path": [
+                "admin",
+                "falla"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modo\": \"ok\",\n  \"delayMs\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET estado falla",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{accesoUrl}}/admin/falla",
+              "host": [
+                "{{accesoUrl}}"
+              ],
+              "path": [
+                "admin",
+                "falla"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "espaciosUrl",
+      "value": "http://127.0.0.1:5001"
+    },
+    {
+      "key": "pagosUrl",
+      "value": "http://127.0.0.1:5002"
+    },
+    {
+      "key": "accesoUrl",
+      "value": "http://127.0.0.1:5003"
+    },
+    {
+      "key": "sagaId",
+      "value": "demo-101"
+    },
+    {
+      "key": "espacioId",
+      "value": "E-001"
+    },
+    {
+      "key": "patente",
+      "value": "ABCD12"
+    }
+  ]
+}

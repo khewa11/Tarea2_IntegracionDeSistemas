@@ -5,3 +5,10 @@ __pycache__/
 *.db
 *.db-wal
 *.db-shm
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.db
+*.db-*
+.env
+.venv/
