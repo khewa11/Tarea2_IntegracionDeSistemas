@@ -3,11 +3,12 @@ import json
 import time
 import asyncio
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Optional, Any
 
 import httpx
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 app = FastAPI(title="BFF Web - Estacionamiento Forma C", version="1.0.0")
 
@@ -40,6 +41,32 @@ def log_json(
     if modo is not None:
         entry["modo"] = modo
     print(json.dumps(entry, ensure_ascii=False), flush=True)
+
+
+# Demo web estática (HTML + JS sin build). El Gateway la publica sin JWT en /bff/demo.
+DEMO_DIR = Path(__file__).resolve().parent / "demo"
+DEMO_ARCHIVOS = {
+    "index.html": "text/html; charset=utf-8",
+    "app.js": "text/javascript; charset=utf-8",
+    "styles.css": "text/css; charset=utf-8",
+}
+
+
+def _archivo_demo(nombre: str):
+    if nombre not in DEMO_ARCHIVOS:  # lista blanca: no hay acceso a otras rutas del disco
+        return JSONResponse(status_code=404, content={"error": "ARCHIVO_NO_ENCONTRADO"})
+    return FileResponse(DEMO_DIR / nombre, media_type=DEMO_ARCHIVOS[nombre],
+                        headers={"Cache-Control": "no-store"})
+
+
+@app.get("/bff/demo")
+async def demo_index():
+    return _archivo_demo("index.html")
+
+
+@app.get("/bff/demo/{archivo}")
+async def demo_archivo(archivo: str):
+    return _archivo_demo(archivo)
 
 
 @app.get("/health")

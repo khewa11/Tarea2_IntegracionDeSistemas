@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reserva de estacionamiento</title>
+  <link rel="stylesheet" href="/bff/demo/styles.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="contenedor barra__fila">
+      <div>
+        <h1>Reserva de estacionamiento</h1>
+        <p class="sub">Demo · Saga orquestada vía Gateway y BFF</p>
+      </div>
+      <span id="sesion" class="chip">Conectando…</span>
+    </div>
+  </header>
+
+  <main class="contenedor">
+    <div id="aviso" class="aviso" role="alert" hidden></div>
+
+    <section class="tarjeta" id="vista-formulario">
+      <h2>Nueva reserva</h2>
+      <form id="formulario" autocomplete="off">
+        <label>Espacio
+          <select id="espacio" required>
+            <option value="">Cargando espacios…</option>
+          </select>
+        </label>
+        <label>Patente
+          <input id="patente" required maxlength="16" placeholder="ABCD12" pattern="[A-Za-z0-9]{4,8}">
+        </label>
+        <label>Monto (CLP)
+          <input id="monto" type="number" required min="1" step="1" value="4000">
+        </label>
+        <button type="submit" id="reservar">Reservar</button>
+      </form>
+      <p class="nota">Con Webpay el navegador irá al formulario de pago de Transbank (integración) y volverá aquí.</p>
+    </section>
+
+    <section class="tarjeta" id="vista-resultado" hidden>
+      <div class="resultado__cabecera">
+        <div>
+          <h2>Resultado</h2>
+          <p class="saga">sagaId <code id="r-saga"></code></p>
+        </div>
+        <span id="r-estado" class="estado"></span>
+      </div>
+      <p id="r-motivo" class="motivo" hidden></p>
+
+      <div id="r-degradado" class="degradado" hidden>
+        <strong>Degradación activa:</strong> el controlador de barrera (Acceso) no respondió.
+        Se muestra el resto de la reserva; vuelve a refrescar en unos segundos.
+      </div>
+
+      <div id="r-pagar" class="pagar" hidden>
+        <span>El pago está pendiente en Webpay.</span>
+        <button type="button" id="ir-a-pagar">Ir a pagar</button>
+      </div>
+
+      <div class="bloques">
+        <article class="bloque"><h3>Saga</h3><dl id="b-saga"></dl></article>
+        <article class="bloque"><h3>Espacio</h3><dl id="b-espacio"></dl></article>
+        <article class="bloque"><h3>Cobro</h3><dl id="b-pago"></dl></article>
+        <article class="bloque"><h3>Barrera</h3><dl id="b-acceso"></dl></article>
+      </div>
+
+      <div class="acciones">
+        <button type="button" id="refrescar">Refrescar</button>
+        <button type="button" id="nueva" class="secundario">Nueva reserva</button>
+      </div>
+    </section>
+
+    <section class="tarjeta consulta">
+      <form id="form-consulta" class="consulta__fila">
+        <label>Consultar una reserva existente
+          <input id="consulta-saga" placeholder="S-…" maxlength="64" pattern="[A-Za-z0-9_-]+">
+        </label>
+        <button type="submit" class="secundario">Consultar</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="/bff/demo/app.js"></script>
+</body>
+</html>

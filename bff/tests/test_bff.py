@@ -109,3 +109,15 @@ def test_mi_reserva_completada_no_incluye_pago_pendiente():
     with patch("bff.main.consultar_servicio", side_effect=AsyncMock(side_effect=fake_consultar)):
         data = client.get("/bff/mi-reserva/S-400").json()
     assert "pagoPendiente" not in data
+
+
+def test_demo_estatica_servida_con_lista_blanca():
+    index = client.get("/bff/demo")
+    assert index.status_code == 200 and index.headers["content-type"].startswith("text/html")
+    assert "/bff/demo/app.js" in index.text
+    js = client.get("/bff/demo/app.js")
+    assert js.status_code == 200 and "javascript" in js.headers["content-type"]
+    assert "token_ws" in js.text and "/auth/token" in js.text
+    assert client.get("/bff/demo/styles.css").headers["content-type"].startswith("text/css")
+    for prohibido in ("main.py", "..%2Fmain.py", "README.md"):
+        assert client.get(f"/bff/demo/{prohibido}").status_code == 404
