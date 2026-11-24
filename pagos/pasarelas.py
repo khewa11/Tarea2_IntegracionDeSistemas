@@ -63,6 +63,10 @@ class Pasarela(ABC):
     @abstractmethod
     def reembolsar(self, token: str | None, monto_centavos: int) -> Reembolso: ...
 
+    def consultar(self, token: str) -> str | None:
+        """Estado de la transacción en el proveedor (p. ej. AUTHORIZED); None si no aplica."""
+        return None
+
 
 class PasarelaSimulada(Pasarela):
     """Comportamiento histórico: cobro inmediato con referencia SIM-<sagaId>, sin red."""
@@ -150,6 +154,9 @@ class PasarelaWebpay(Pasarela):
         estado, codigo = r.get("status"), r.get("response_code")
         return Confirmacion(aprobado=(estado == "AUTHORIZED" and codigo == 0), estado_proveedor=estado,
                             response_code=codigo, authorization_code=r.get("authorization_code"))
+
+    def consultar(self, token: str) -> str | None:
+        return self._llamar("consultar", self._tx.status, token).get("status")
 
     def reembolsar(self, token: str | None, monto_centavos: int) -> Reembolso:
         if not token:

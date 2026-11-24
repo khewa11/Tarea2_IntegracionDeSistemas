@@ -21,6 +21,10 @@ class CobroIn(StrictModel):
     monto: Decimal = Field(gt=0, max_digits=14, decimal_places=2)
 
 
+class ConfirmacionPagoIn(StrictModel):
+    token: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=64)]
+
+
 class HabilitacionIn(StrictModel):
     sagaId: Identifier
     patente: Identifier
