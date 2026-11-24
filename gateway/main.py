@@ -4,11 +4,12 @@ import time
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from typing import Optional
+from urllib.parse import parse_qs, quote
 
 import httpx
 import jwt
 from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 app = FastAPI(title="API Gateway - Estacionamiento Forma C", version="1.0.0")
@@ -23,6 +24,13 @@ ORQUESTADOR_URL = os.getenv("ORQUESTADOR_URL", "http://orquestador:4000")
 RATE_LIMIT_MAX = int(os.getenv("RATE_LIMIT_MAX", "40"))
 RATE_LIMIT_WINDOW_S = int(os.getenv("RATE_LIMIT_WINDOW_S", "60"))
 request_history: dict[str, list[float]] = defaultdict(list)
+
+# Excepciones explícitas a la validación JWT (las únicas):
+#   1) retorno de Webpay: /pagos/retorno (GET o POST), solo reenvía token_ws/TBK_* al orquestador
+#   2) archivos estáticos de la demo: GET /bff/demo y GET /bff/demo/<archivo>
+RUTA_RETORNO_PAGO = "/pagos/retorno"
+PARAMETROS_RETORNO = ("token_ws", "TBK_TOKEN", "TBK_ORDEN_COMPRA", "TBK_ID_SESION")
+DEMO_PREFIJO = "/bff/demo"
 
 
 def log_json(
@@ -61,6 +69,22 @@ async def health():
         "implementado": True,
         "jwtConfigurado": bool(JWT_SECRET),
     }
+
+
+def es_ruta_demo(ruta: str, metodo: str) -> bool:
+    """GET de la demo estática. Se rechaza cualquier intento de salir del prefijo."""
+    if metodo != "GET" or ".." in ruta or "\\" in ruta:
+        return False
+    return ruta == DEMO_PREFIJO or ruta.startswith(DEMO_PREFIJO + "/")
+
+
+def cliente_ip(request: Request) -> str:
+    return f"ip:{request.client.host if request.client else 'desconocida'}"
+
+
+async def llamar_upstream(method: str, url: str, body: bytes, headers: dict) -> httpx.Response:
+    async with httpx.AsyncClient(timeout=float(os.getenv("UPSTREAM_TIMEOUT_S", "35"))) as client:
+        return await client.request(method=method, url=url, content=body, headers=headers)
 
 
 @app.post("/auth/token")
@@ -110,6 +134,49 @@ def validar_jwt(request: Request) -> str:
         raise HTTPException(status_code=401, detail="TOKEN_INVALIDO")
 
 
+@app.api_route(RUTA_RETORNO_PAGO, methods=["GET", "POST"])
+async def retorno_pago(request: Request):
+    """Retorno de Webpay (sin JWT: el navegador del usuario llega redirigido por Transbank).
+
+    No contiene lógica de negocio: toma token_ws / TBK_TOKEN / TBK_ORDEN_COMPRA /
+    TBK_ID_SESION (query o formulario), los reenvía al orquestador y redirige al
+    navegador a la página de resultado de la demo.
+    """
+    inicio = time.perf_counter()
+    if not verificar_rate_limit(cliente_ip(request)):
+        log_json(paso="RATE_LIMIT", resultado="EXCEDIDO", codigo=429, detalle="retorno_pago")
+        return JSONResponse(status_code=429, content={"error": "RATE_LIMIT_EXCEEDED", "limitePorVentana": RATE_LIMIT_MAX})
+
+    valores = parse_qs(request.url.query)
+    if request.method == "POST":
+        cuerpo = (await request.body()).decode("utf-8", errors="replace")
+        if "application/x-www-form-urlencoded" in request.headers.get("content-type", ""):
+            for clave, lista in parse_qs(cuerpo).items():
+                valores.setdefault(clave, lista)
+    parametros = {k: valores[k][0][:64] for k in PARAMETROS_RETORNO if valores.get(k) and valores[k][0]}
+
+    saga_id = None
+    try:
+        resp = await llamar_upstream("POST", f"{ORQUESTADOR_URL}{RUTA_RETORNO_PAGO}",
+                                     json.dumps(parametros).encode("utf-8"),
+                                     {"Content-Type": "application/json", "X-Authenticated-Client": "webpay-retorno"})
+        codigo = resp.status_code
+        if codigo == 200:
+            saga_id = resp.json().get("sagaId")
+    except (httpx.RequestError, ValueError):
+        codigo = 502
+
+    tipo = "TBK_TOKEN" if "TBK_TOKEN" in parametros else ("token_ws" if "token_ws" in parametros else "sin_token")
+    log_json(paso="RETORNO_PAGO", resultado="OK" if saga_id else "ERROR", saga_id=saga_id, codigo=codigo,
+             duracion_ms=(time.perf_counter() - inicio) * 1000, detalle=f"tipo={tipo}")
+    if saga_id:
+        destino = f"{DEMO_PREFIJO}?sagaId={quote(saga_id)}"
+    else:
+        error = "PAGO_NO_ENCONTRADO" if codigo in (404, 422) else "SERVICIO_NO_DISPONIBLE"
+        destino = f"{DEMO_PREFIJO}?error={error}"
+    return RedirectResponse(destino, status_code=303)
+
+
 @app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def gateway_proxy(full_path: str, request: Request):
     inicio = time.perf_counter()
@@ -121,13 +188,16 @@ async def gateway_proxy(full_path: str, request: Request):
         log_json(paso="BLOQUEO_ADMIN", resultado="RECHAZADO", codigo=403, duracion_ms=duracion)
         return JSONResponse(status_code=403, content={"error": "FORBIDDEN_ADMIN_ENDPOINT"})
 
-    # 2. Autenticación centralizada JWT HS256
-    try:
-        cliente_id = validar_jwt(request)
-    except HTTPException as exc:
-        duracion = (time.perf_counter() - inicio) * 1000
-        log_json(paso="VALIDAR_JWT", resultado="DENEGADO", codigo=exc.status_code, duracion_ms=duracion)
-        return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
+    # 2. Autenticación centralizada JWT HS256 (excepto los estáticos de la demo)
+    if es_ruta_demo(ruta, request.method):
+        cliente_id = cliente_ip(request)
+    else:
+        try:
+            cliente_id = validar_jwt(request)
+        except HTTPException as exc:
+            duracion = (time.perf_counter() - inicio) * 1000
+            log_json(paso="VALIDAR_JWT", resultado="DENEGADO", codigo=exc.status_code, duracion_ms=duracion)
+            return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
 
     # 3. Rate limiting por cliente
     if not verificar_rate_limit(cliente_id):
@@ -178,13 +248,7 @@ async def gateway_proxy(full_path: str, request: Request):
     }
 
     try:
-        async with httpx.AsyncClient(timeout=float(os.getenv("UPSTREAM_TIMEOUT_S", "35"))) as client:
-            upstream_resp = await client.request(
-                method=request.method,
-                url=target_url,
-                content=body_bytes,
-                headers=forward_headers,
-            )
+        upstream_resp = await llamar_upstream(request.method, target_url, body_bytes, forward_headers)
         duracion = (time.perf_counter() - inicio) * 1000
         log_json(
             paso=f"PROXY_{request.method}_{ruta}",
