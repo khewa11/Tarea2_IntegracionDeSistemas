@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from common.models import CobroIn
 from common.util import database, db_location, log_event, now, out, prior_command, record_command, setup_journal
+from pagos.pasarelas import Pasarela, crear_pasarela
 
 SERVICE = "pagos"
 
@@ -26,8 +27,9 @@ def init_db(path: str) -> None:
         setup_journal(db)
 
 
-def create_app(db_path: str | None = None) -> FastAPI:
+def create_app(db_path: str | None = None, pasarela: Pasarela | None = None) -> FastAPI:
     path = db_location(db_path, "/data/pagos.db")
+    pasarela = pasarela or crear_pasarela()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -38,7 +40,7 @@ def create_app(db_path: str | None = None) -> FastAPI:
 
     @app.get("/health")
     def health():
-        return {"servicio": SERVICE, "estado": "ok", "pasarela": "SIMULADA"}
+        return {"servicio": SERVICE, "estado": "ok", "pasarela": pasarela.nombre}
 
     @app.post("/cobros", status_code=201)
     def cobrar(request: CobroIn):
@@ -55,7 +57,7 @@ def create_app(db_path: str | None = None) -> FastAPI:
                 result = (409, {"error": "SAGA_COMPENSADA", "detalle": "No es posible cobrar tras un reembolso"})
                 record_command(db, request.sagaId, "cobrar", data, *result)
             else:
-                reference = "SIM-" + request.sagaId
+                reference = pasarela.iniciar(request.sagaId, centavos).referencia
                 instant = now()
                 db.execute("INSERT INTO cobros VALUES(?,?,?,?,?,?,?)",
                            (request.sagaId, centavos, "CLP", "COBRADO", reference, instant, instant))
@@ -80,6 +82,7 @@ def create_app(db_path: str | None = None) -> FastAPI:
                     status = "SIN_COBRO"
                 else:
                     if row["estado"] == "COBRADO":
+                        pasarela.reembolsar(None, row["monto_centavos"])
                         db.execute("UPDATE cobros SET estado='REEMBOLSADO', actualizado_en=? WHERE saga_id=?", (now(), saga_id))
                     status = "REEMBOLSADO"
                 result = (200, {"sagaId": saga_id, "estado": status})
