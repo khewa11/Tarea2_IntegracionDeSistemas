@@ -40,20 +40,34 @@ Webpay devuelve al usuario a `PAGOS_RETURN_URL` cuando termina de pagar. Para qu
 
 ### Preparación (una sola vez)
 
-1. Crear una cuenta gratuita en [ngrok.com](https://ngrok.com) e instalar ngrok según su página de descarga.
-2. Registrar el token de la cuenta (aparece en el panel de ngrok):
+1. Crear una cuenta gratuita en [ngrok.com](https://ngrok.com).
+2. Instalar ngrok:
+   - **Windows / macOS / Linux:** descargar desde [ngrok.com/download](https://ngrok.com/download), descomprimir y dejar el ejecutable en una carpeta del `PATH`.
+   - **Arch / CachyOS:** `paru -S ngrok` (paquete AUR).
+
+   Comprobar con `ngrok version`.
+3. Registrar el token de la cuenta (panel de ngrok → **Your Authtoken**):
    ```
    ngrok config add-authtoken <TU_TOKEN_DE_NGROK>
    ```
+4. Recomendado: en el panel de ngrok → **Domains**, revisar el dominio fijo gratuito de la cuenta (por ejemplo `nombre-al-azar.ngrok-free.dev`). Con un dominio fijo, `PAGOS_RETURN_URL` se configura una sola vez.
 
 ### Pasos
 
 1. Levantar el sistema normalmente (`docker compose up --build -d --wait`).
-2. En **otra terminal**, abrir el túnel y dejarlo abierto:
+2. En **otra terminal**, abrir el túnel hacia el gateway y dejarlo abierto:
    ```
    ngrok http 8080
    ```
-   Copiar la URL `https://…` de la línea **Forwarding**, por ejemplo `https://abcd-1234.ngrok-free.app`.
+   o, con el dominio fijo de la cuenta: `ngrok http --url=<tu-dominio>.ngrok-free.dev 8080` (en versiones antiguas de ngrok, `--domain=`).
+
+   Copiar la URL `https://…` de la línea **Forwarding**, por ejemplo `https://abcd-1234.ngrok-free.app`. También se puede leer desde la API local de ngrok: `curl -s http://127.0.0.1:4040/api/tunnels`.
+
+   Para comprobar que el túnel llega al gateway:
+   ```
+   curl -H "ngrok-skip-browser-warning: 1" https://abcd-1234.ngrok-free.app/health
+   ```
+   Debe responder `{"servicio":"gateway","estado":"ok",...}`. La cabecera evita la página de aviso de ngrok, que solo aparece en navegadores.
 3. Agregar al final de `.env` (reemplazando la URL por la copiada):
    ```
    PASARELA=webpay
@@ -80,6 +94,8 @@ Tarjetas de prueba de la documentación oficial de Transbank («Cómo empezar» 
 | No paga a tiempo | Cerrar la pestaña de Webpay sin pagar y esperar `PAGO_TIMEOUT_S` (300 s por defecto; se revisa cada 15 s) | Consultar el sagaId en la demo: `COMPENSADA` (`PAGO_TIMEOUT`); espacio `LIBERADA` |
 
 Otras tarjetas válidas: AMEX `3700 0000 0002 032` (CVV `1234`, aprobada) y Redcompra débito `4051 8842 3993 7763` (aprobada) o `5186 0085 4123 3829` (rechazada).
+
+Mientras ngrok corre, **http://127.0.0.1:4040** muestra cada petición que pasa por el túnel, incluido el retorno de Webpay a `/pagos/retorno` con `token_ws` (pago) o `TBK_TOKEN` (anulación). Sirve para depurar y para mostrar el flujo en una demostración.
 
 Para ver los pasos de la saga mientras se paga:
 ```
@@ -136,7 +152,9 @@ docker compose down
 
 ## Validación realizada
 
-40 pruebas pytest aprobadas y tres escenarios HTTP reales aprobados con seis procesos Uvicorn y bases temporales independientes. Ver `docs/evidencia_integracion/`. No se ejecutó Docker Engine en el entorno de validación: repetir con Docker Desktop y guardar evidencia propia antes de aprobar el PR. Los archivos de Paso 0 y el README original de A (`docs/README_PERSONA_A.md`) son referencias históricas, no las instrucciones del sistema final. El scaffold no se ejecuta en Compose final.
+**Rama `feature/webpay-demo` (pasarela adaptable, Webpay Plus de integración y demo web):** 76 pruebas pytest aprobadas con `PASARELA=simulada` (40 previas y 36 nuevas, con dobles del SDK de Transbank y sin red). En Docker Compose, con la pasarela simulada, se recorrió la demo por el gateway y se aprobaron los escenarios 1, 2 y 3 de `scripts/escenarios.py`; la base de Pagos existente se migró al arrancar. Con `PASARELA=webpay` y un túnel ngrok se creó una transacción real en el ambiente de integración de Transbank (cobro `PENDIENTE`, HTTP 202) y se anuló por `/pagos/retorno` (saga `COMPENSADA` con `PAGO_ANULADO`, espacio liberado y cobro `ANULADO`). El pago desde el navegador con las tarjetas de prueba se verificó manualmente.
+
+**Integración inicial de las tres ramas:** 40 pruebas pytest aprobadas y tres escenarios HTTP reales aprobados con seis procesos Uvicorn y bases temporales independientes. Ver `docs/evidencia_integracion/`. No se ejecutó Docker Engine en el entorno de validación: repetir con Docker Desktop y guardar evidencia propia antes de aprobar el PR. Los archivos de Paso 0 y el README original de A (`docs/README_PERSONA_A.md`) son referencias históricas, no las instrucciones del sistema final. El scaffold no se ejecuta en Compose final.
 
 ## Integración Git
 
